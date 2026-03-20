@@ -1,0 +1,31 @@
+# Node.js
+node_modules/
+dist/
+*.log
+npm-debug.log*
+
+# Unity meta files (keep these if copying to Unity project)
+# *.meta
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+*.js.map
+
+# Environment
+.env
+.env.local
+
+# Claude Code local settings
+.claude/
+
+# Windows artifacts
+nul
