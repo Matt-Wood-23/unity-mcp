@@ -2,6 +2,8 @@
 
 An MCP (Model Context Protocol) server that enables AI assistants like Claude to view and interact with the Unity Editor in real-time. Create GameObjects, modify components, control play mode, manage materials, and more - all through natural language.
 
+![UnityMCP Demo](UnityMCP.gif)
+
 ## Features
 
 - **29 MCP Tools** for comprehensive Unity Editor control
