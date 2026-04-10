@@ -32,6 +32,7 @@ namespace UnityMCPBridge
                         "/console" => ConsoleDataProvider.GetConsoleLogs(),
                         "/selection" => SelectionDataProvider.GetCurrentSelection(),
                         "/material" => MaterialHandler.GetMaterialInfo(request.QueryString["path"]),
+                        "/profiler" => ProfilerDataProvider.GetProfilerData(),
                         _ => JsonConvert.SerializeObject(new { error = "Unknown endpoint", path })
                     };
                 }
@@ -65,6 +66,48 @@ namespace UnityMCPBridge
                         "/sprite/configure" => SpriteHandler.ConfigureSpriteSettings(body),
                         "/sprite/slice" => SpriteHandler.SliceSpriteSheet(body),
                         "/sprite/renderer/create" => SpriteHandler.CreateSpriteRenderer(body),
+                        // Screenshot
+                        "/screenshot" => ScreenshotProvider.TakeScreenshot(body),
+                        // Code execution
+                        "/code/execute" => CodeExecutionHandler.ExecuteCode(body),
+                        // UI
+                        "/ui/create" => UIHandler.CreateUIElement(body),
+                        "/ui/modify" => UIHandler.ModifyUIElement(body),
+                        // Batch operations
+                        "/batch/modify" => BatchHandler.BatchModify(body),
+                        "/batch/delete" => BatchHandler.BatchDelete(body),
+                        // Terrain
+                        "/terrain/create" => TerrainHandler.CreateTerrain(body),
+                        "/terrain/height" => TerrainHandler.ModifyTerrainHeight(body),
+                        "/terrain/paint" => TerrainHandler.PaintTerrainTexture(body),
+                        "/terrain/trees" => TerrainHandler.PlaceTerrainTrees(body),
+                        "/terrain/info" => TerrainHandler.GetTerrainInfo(body),
+                        // Animation
+                        "/animator/info" => AnimationHandler.GetAnimatorInfo(body),
+                        "/animator/parameter" => AnimationHandler.SetAnimatorParameter(body),
+                        "/animator/play" => AnimationHandler.PlayAnimation(body),
+                        // Lighting & Environment
+                        "/light/create" => LightingHandler.CreateLight(body),
+                        "/light/modify" => LightingHandler.ModifyLight(body),
+                        "/light/info" => LightingHandler.GetLightInfo(body),
+                        "/environment/set" => LightingHandler.SetEnvironment(body),
+                        "/environment/get" => LightingHandler.GetEnvironment(body),
+                        // Prefab
+                        "/prefab/create" => PrefabHandler.CreatePrefab(body),
+                        "/prefab/unpack" => PrefabHandler.UnpackPrefab(body),
+                        "/prefab/apply" => PrefabHandler.ApplyPrefabOverrides(body),
+                        "/prefab/revert" => PrefabHandler.RevertPrefabOverrides(body),
+                        "/prefab/info" => PrefabHandler.GetPrefabInfo(body),
+                        // Particle System
+                        "/particles/create" => ParticleSystemHandler.CreateParticleSystem(body),
+                        "/particles/modify" => ParticleSystemHandler.ModifyParticleSystem(body),
+                        "/particles/play" => ParticleSystemHandler.PlayParticleSystem(body),
+                        "/particles/info" => ParticleSystemHandler.GetParticleSystemInfo(body),
+                        // Physics
+                        "/physics/rigidbody" => PhysicsHandler.AddRigidbody(body),
+                        "/physics/collider" => PhysicsHandler.AddCollider(body),
+                        "/physics/settings/set" => PhysicsHandler.SetPhysicsSettings(body),
+                        "/physics/settings/get" => PhysicsHandler.GetPhysicsSettings(body),
                         _ => JsonConvert.SerializeObject(new { error = "Unknown endpoint", path })
                     };
                 }

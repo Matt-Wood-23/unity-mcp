@@ -364,4 +364,599 @@ namespace UnityMCPBridge.Models
         public int CellWidth { get; set; }
         public int CellHeight { get; set; }
     }
+
+    // Screenshot Models
+    public class TakeScreenshotRequest
+    {
+        public string Source { get; set; } = "game"; // "game" or "scene"
+        public int Width { get; set; } = 640;
+        public int Height { get; set; } = 480;
+        public string Format { get; set; } = "png"; // "png" or "jpg"
+        public int Quality { get; set; } = 85; // JPG quality
+        public string SavePath { get; set; }
+    }
+
+    public class ScreenshotResult : OperationResult
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string Format { get; set; }
+        public string Base64 { get; set; }
+        public string SavePath { get; set; }
+    }
+
+    // Code Execution Models
+    public class ExecuteCodeRequest
+    {
+        public string Code { get; set; }
+    }
+
+    public class CodeExecutionResult : OperationResult
+    {
+        public string Output { get; set; }
+        public List<string> Logs { get; set; }
+        public List<string> Errors { get; set; }
+    }
+
+    // UI Models
+    public class Vector2Data
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+    }
+
+    public class CreateUIElementRequest
+    {
+        public string ElementType { get; set; } // Canvas, Text, Button, Image, Panel, InputField, Slider, Toggle, Dropdown, ScrollView, RawImage
+        public string Name { get; set; }
+        public int? ParentId { get; set; }
+        public string Text { get; set; }
+        public int? FontSize { get; set; }
+        public ColorData Color { get; set; }
+        public string SpritePath { get; set; }
+        public Vector2Data AnchoredPosition { get; set; }
+        public Vector2Data SizeDelta { get; set; }
+        public Vector2Data AnchorMin { get; set; }
+        public Vector2Data AnchorMax { get; set; }
+        public Vector2Data Pivot { get; set; }
+    }
+
+    public class ModifyUIElementRequest
+    {
+        public int InstanceId { get; set; }
+        public string Text { get; set; }
+        public int? FontSize { get; set; }
+        public ColorData Color { get; set; }
+        public string SpritePath { get; set; }
+        public string Alignment { get; set; }
+        public bool? Interactable { get; set; }
+        public Vector2Data AnchoredPosition { get; set; }
+        public Vector2Data SizeDelta { get; set; }
+        public Vector2Data AnchorMin { get; set; }
+        public Vector2Data AnchorMax { get; set; }
+        public Vector2Data Pivot { get; set; }
+    }
+
+    // Profiler Models
+    public class ProfilerData
+    {
+        public MemoryData Memory { get; set; }
+        public RenderingData Rendering { get; set; }
+        public ObjectCountData ObjectCounts { get; set; }
+        public AssetCountData AssetCounts { get; set; }
+        public TimeData Time { get; set; }
+        public PhysicsData Physics { get; set; }
+    }
+
+    public class MemoryData
+    {
+        public float TotalAllocatedMB { get; set; }
+        public float TotalReservedMB { get; set; }
+        public float TotalUnusedReservedMB { get; set; }
+        public float MonoUsedMB { get; set; }
+        public float MonoHeapMB { get; set; }
+        public float GfxDriverAllocatedMB { get; set; }
+        public float TempAllocatorMB { get; set; }
+    }
+
+    public class RenderingData
+    {
+        public string CurrentResolution { get; set; }
+        public string ScreenResolution { get; set; }
+        public string QualityLevel { get; set; }
+        public int VSyncCount { get; set; }
+        public int TargetFrameRate { get; set; }
+        public int MaxTextureSize { get; set; }
+    }
+
+    public class ObjectCountData
+    {
+        public int GameObjects { get; set; }
+        public int Cameras { get; set; }
+        public int Lights { get; set; }
+        public int Renderers { get; set; }
+        public int Rigidbodies { get; set; }
+        public int AudioSources { get; set; }
+        public int ParticleSystems { get; set; }
+        public int Canvases { get; set; }
+        public int Animators { get; set; }
+    }
+
+    public class AssetCountData
+    {
+        public int Materials { get; set; }
+        public int Textures { get; set; }
+        public int Meshes { get; set; }
+        public int AudioClips { get; set; }
+        public int Prefabs { get; set; }
+        public int Scripts { get; set; }
+        public int Shaders { get; set; }
+        public int Animations { get; set; }
+        public int ScriptableObjects { get; set; }
+    }
+
+    public class TimeData
+    {
+        public bool IsPlaying { get; set; }
+        public float TimeSinceStartup { get; set; }
+        public float RealtimeSinceStartup { get; set; }
+        public float DeltaTime { get; set; }
+        public float FixedDeltaTime { get; set; }
+        public float TimeScale { get; set; }
+        public int FrameCount { get; set; }
+    }
+
+    public class PhysicsData
+    {
+        public Vector3Data Gravity { get; set; }
+        public int DefaultSolverIterations { get; set; }
+        public int DefaultSolverVelocityIterations { get; set; }
+        public float BounceThreshold { get; set; }
+        public float DefaultContactOffset { get; set; }
+        public string SimulationMode { get; set; }
+    }
+
+    // Batch Operation Models
+    public class BatchFilter
+    {
+        public string Name { get; set; }
+        public string Tag { get; set; }
+        public string Layer { get; set; }
+        public string HasComponent { get; set; }
+        public bool ActiveOnly { get; set; }
+        public int MaxResults { get; set; }
+    }
+
+    public class BatchModifyRequest
+    {
+        public List<int> InstanceIds { get; set; }
+        public BatchFilter Filter { get; set; }
+        public string Tag { get; set; }
+        public int? Layer { get; set; }
+        public bool? IsActive { get; set; }
+        public bool? IsStatic { get; set; }
+        public Vector3Data Position { get; set; }
+        public Vector3Data Rotation { get; set; }
+        public Vector3Data Scale { get; set; }
+        public int? ParentId { get; set; }
+        public string AddComponent { get; set; }
+        public string RemoveComponent { get; set; }
+    }
+
+    public class BatchDeleteRequest
+    {
+        public List<int> InstanceIds { get; set; }
+        public BatchFilter Filter { get; set; }
+    }
+
+    public class BatchOperationResult : OperationResult
+    {
+        public int AffectedCount { get; set; }
+        public List<string> Errors { get; set; }
+    }
+
+    // Terrain Models
+    public class CreateTerrainRequest
+    {
+        public string Name { get; set; }
+        public float Width { get; set; } = 500;
+        public float Length { get; set; } = 500;
+        public float Height { get; set; } = 100;
+        public int HeightmapResolution { get; set; } = 513;
+        public int AlphamapResolution { get; set; } = 512;
+        public Vector3Data Position { get; set; }
+        public string SavePath { get; set; }
+    }
+
+    public class ModifyTerrainHeightRequest
+    {
+        public int InstanceId { get; set; }
+        public string Operation { get; set; } // set, raise, lower, smooth, flatten, perlin
+        public float Value { get; set; }
+        public float Strength { get; set; } = 1f;
+        public float AreaCenterX { get; set; } = -1; // Normalized 0-1, -1 means whole terrain
+        public float AreaCenterZ { get; set; } = -1;
+        public float AreaRadius { get; set; } = 0.1f;
+        public int Seed { get; set; }
+    }
+
+    public class PaintTerrainTextureRequest
+    {
+        public int InstanceId { get; set; }
+        public string TexturePath { get; set; }
+        public float TileSize { get; set; } = 10;
+        public int LayerIndex { get; set; }
+        public float CenterX { get; set; } = 0.5f;
+        public float CenterY { get; set; } = 0.5f;
+        public float Radius { get; set; } = 0.1f;
+        public float Strength { get; set; } = 1f;
+    }
+
+    public class PlaceTerrainTreesRequest
+    {
+        public int InstanceId { get; set; }
+        public string PrefabPath { get; set; }
+        public int PrototypeIndex { get; set; }
+        public int Count { get; set; } = 50;
+        public float MinScale { get; set; } = 0.8f;
+        public float MaxScale { get; set; } = 1.2f;
+        public float Density { get; set; } = 1f;
+        public float AreaCenterX { get; set; } = 0.5f;
+        public float AreaCenterZ { get; set; } = 0.5f;
+        public float AreaRadius { get; set; } = 0.5f;
+        public int Seed { get; set; }
+    }
+
+    public class TerrainInfoRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    // ========== Animation/Animator Models ==========
+
+    public class GetAnimatorInfoRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    public class SetAnimatorParameterRequest
+    {
+        public int InstanceId { get; set; }
+        public string ParameterName { get; set; }
+        public string ParameterType { get; set; } // "float", "int", "bool", "trigger"
+        public object Value { get; set; }
+    }
+
+    public class PlayAnimationRequest
+    {
+        public int InstanceId { get; set; }
+        public string StateName { get; set; }
+        public int Layer { get; set; }
+        public float NormalizedTime { get; set; } = -1f;
+    }
+
+    public class AnimatorParameterInfo
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Value { get; set; }
+    }
+
+    public class AnimatorLayerInfo
+    {
+        public int Index { get; set; }
+        public string Name { get; set; }
+        public float Weight { get; set; }
+    }
+
+    public class AnimatorClipInfo
+    {
+        public string Name { get; set; }
+        public float Length { get; set; }
+        public bool IsLooping { get; set; }
+        public float FrameRate { get; set; }
+    }
+
+    public class AnimatorInfoResult
+    {
+        public bool Success { get; set; }
+        public string ControllerName { get; set; }
+        public bool HasAnimator { get; set; }
+        public bool IsPlaying { get; set; }
+        public float Speed { get; set; }
+        public List<AnimatorParameterInfo> Parameters { get; set; }
+        public List<AnimatorLayerInfo> Layers { get; set; }
+        public List<AnimatorClipInfo> Clips { get; set; }
+        public string CurrentStateName { get; set; }
+        public float CurrentStateNormalizedTime { get; set; }
+        public string Message { get; set; }
+    }
+
+    // ========== Lighting & Environment Models ==========
+
+    public class CreateLightRequest
+    {
+        public string Name { get; set; }
+        public string LightType { get; set; } = "Point"; // Directional, Point, Spot, Area
+        public ColorData Color { get; set; }
+        public float Intensity { get; set; } = 1f;
+        public float Range { get; set; } = 10f;
+        public float SpotAngle { get; set; } = 30f;
+        public string Shadows { get; set; } = "None"; // None, Hard, Soft
+        public Vector3Data Position { get; set; }
+        public Vector3Data Rotation { get; set; }
+        public int? ParentId { get; set; }
+    }
+
+    public class ModifyLightRequest
+    {
+        public int InstanceId { get; set; }
+        public ColorData Color { get; set; }
+        public float? Intensity { get; set; }
+        public float? Range { get; set; }
+        public float? SpotAngle { get; set; }
+        public string Shadows { get; set; }
+        public string LightType { get; set; }
+    }
+
+    public class GetLightInfoRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    public class LightInfoResult
+    {
+        public bool Success { get; set; }
+        public int InstanceId { get; set; }
+        public string Name { get; set; }
+        public string LightType { get; set; }
+        public ColorData Color { get; set; }
+        public float Intensity { get; set; }
+        public float Range { get; set; }
+        public float SpotAngle { get; set; }
+        public string Shadows { get; set; }
+        public float ShadowStrength { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class SetEnvironmentRequest
+    {
+        public string SkyboxMaterialPath { get; set; }
+        public string AmbientMode { get; set; } // Skybox, Trilight, Flat, Custom
+        public ColorData AmbientColor { get; set; }
+        public ColorData AmbientSkyColor { get; set; }
+        public ColorData AmbientEquatorColor { get; set; }
+        public ColorData AmbientGroundColor { get; set; }
+        public float? AmbientIntensity { get; set; }
+        public float? ReflectionIntensity { get; set; }
+        public bool? Fog { get; set; }
+        public ColorData FogColor { get; set; }
+        public string FogMode { get; set; } // Linear, Exponential, ExponentialSquared
+        public float? FogDensity { get; set; }
+        public float? FogStartDistance { get; set; }
+        public float? FogEndDistance { get; set; }
+    }
+
+    public class EnvironmentInfoResult
+    {
+        public bool Success { get; set; }
+        public string SkyboxMaterial { get; set; }
+        public string AmbientMode { get; set; }
+        public ColorData AmbientColor { get; set; }
+        public ColorData AmbientSkyColor { get; set; }
+        public ColorData AmbientEquatorColor { get; set; }
+        public ColorData AmbientGroundColor { get; set; }
+        public float AmbientIntensity { get; set; }
+        public float ReflectionIntensity { get; set; }
+        public bool Fog { get; set; }
+        public ColorData FogColor { get; set; }
+        public string FogMode { get; set; }
+        public float FogDensity { get; set; }
+        public float FogStartDistance { get; set; }
+        public float FogEndDistance { get; set; }
+        public string Message { get; set; }
+    }
+
+    // ========== Physics Models ==========
+
+    public class AddRigidbodyRequest
+    {
+        public int InstanceId { get; set; }
+        public float Mass { get; set; } = 1f;
+        public float Drag { get; set; } = 0f;
+        public float AngularDrag { get; set; } = 0.05f;
+        public bool UseGravity { get; set; } = true;
+        public bool IsKinematic { get; set; } = false;
+        public string CollisionDetection { get; set; } = "Discrete";
+        public string Interpolation { get; set; } = "None";
+        public string Constraints { get; set; } // comma-separated: "FreezePositionX,FreezeRotationY"
+    }
+
+    public class AddColliderRequest
+    {
+        public int InstanceId { get; set; }
+        public string ColliderType { get; set; } // Box, Sphere, Capsule, Mesh
+        public bool IsTrigger { get; set; } = false;
+        public string PhysicMaterialPath { get; set; }
+        public Vector3Data Center { get; set; }
+        public Vector3Data Size { get; set; } // Box
+        public float? Radius { get; set; } // Sphere/Capsule
+        public float? Height { get; set; } // Capsule
+        public int? Direction { get; set; } // Capsule: 0=X, 1=Y, 2=Z
+    }
+
+    public class SetPhysicsSettingsRequest
+    {
+        public Vector3Data Gravity { get; set; }
+        public float? BounceThreshold { get; set; }
+        public float? DefaultContactOffset { get; set; }
+        public float? SleepThreshold { get; set; }
+        public int? DefaultSolverIterations { get; set; }
+        public int? DefaultSolverVelocityIterations { get; set; }
+        public bool? AutoSyncTransforms { get; set; }
+    }
+
+    public class PhysicsSettingsResult
+    {
+        public bool Success { get; set; }
+        public Vector3Data Gravity { get; set; }
+        public float BounceThreshold { get; set; }
+        public float DefaultContactOffset { get; set; }
+        public float SleepThreshold { get; set; }
+        public int DefaultSolverIterations { get; set; }
+        public int DefaultSolverVelocityIterations { get; set; }
+        public bool AutoSyncTransforms { get; set; }
+        public string SimulationMode { get; set; }
+        public string Message { get; set; }
+    }
+
+    // ========== Prefab Models ==========
+
+    public class CreatePrefabRequest
+    {
+        public int InstanceId { get; set; }
+        public string SavePath { get; set; }    // e.g. "Assets/Prefabs/Player.prefab"
+        public bool ReplacePrefab { get; set; } // overwrite if exists
+    }
+
+    public class UnpackPrefabRequest
+    {
+        public int InstanceId { get; set; }
+        public bool Completely { get; set; } = true; // unpack all nested prefabs too
+    }
+
+    public class ApplyPrefabOverridesRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    public class RevertPrefabOverridesRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    public class PrefabInfoResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string PrefabPath { get; set; }
+        public bool IsPrefabInstance { get; set; }
+        public bool HasOverrides { get; set; }
+        public string PrefabStatus { get; set; }
+        public int? InstanceId { get; set; }
+    }
+
+    // ========== Particle System Models ==========
+
+    public class MinMaxCurveData
+    {
+        public float Constant { get; set; }
+        public float ConstantMin { get; set; }
+        public float ConstantMax { get; set; }
+        public string Mode { get; set; } = "Constant"; // Constant, TwoConstants
+    }
+
+    public class MinMaxGradientData
+    {
+        public ColorData Color { get; set; }
+        public ColorData ColorMin { get; set; }
+        public ColorData ColorMax { get; set; }
+        public string Mode { get; set; } = "Color"; // Color, TwoColors
+    }
+
+    public class CreateParticleSystemRequest
+    {
+        public string Name { get; set; }
+        public int? ParentId { get; set; }
+        public Vector3Data Position { get; set; }
+        public Vector3Data Rotation { get; set; }
+        // Main module
+        public float? Duration { get; set; }
+        public bool? Looping { get; set; }
+        public float? StartLifetime { get; set; }
+        public float? StartSpeed { get; set; }
+        public float? StartSize { get; set; }
+        public ColorData StartColor { get; set; }
+        public int? MaxParticles { get; set; }
+        public string SimulationSpace { get; set; } // Local, World
+        public bool? PlayOnAwake { get; set; }
+        // Emission
+        public float? EmissionRate { get; set; }
+        // Shape
+        public string Shape { get; set; } // Sphere, Hemisphere, Cone, Box, Circle, Edge
+        public float? ShapeRadius { get; set; }
+        public float? ShapeAngle { get; set; }
+        // Gravity
+        public float? GravityModifier { get; set; }
+    }
+
+    public class ModifyParticleSystemRequest
+    {
+        public int InstanceId { get; set; }
+        // Main module
+        public float? Duration { get; set; }
+        public bool? Looping { get; set; }
+        public float? StartLifetime { get; set; }
+        public float? StartLifetimeMin { get; set; }
+        public float? StartLifetimeMax { get; set; }
+        public float? StartSpeed { get; set; }
+        public float? StartSpeedMin { get; set; }
+        public float? StartSpeedMax { get; set; }
+        public float? StartSize { get; set; }
+        public float? StartSizeMin { get; set; }
+        public float? StartSizeMax { get; set; }
+        public ColorData StartColor { get; set; }
+        public ColorData StartColorMin { get; set; }
+        public ColorData StartColorMax { get; set; }
+        public int? MaxParticles { get; set; }
+        public string SimulationSpace { get; set; }
+        public bool? PlayOnAwake { get; set; }
+        public float? GravityModifier { get; set; }
+        public float? SimulationSpeed { get; set; }
+        // Emission
+        public float? EmissionRate { get; set; }
+        // Shape
+        public string Shape { get; set; }
+        public float? ShapeRadius { get; set; }
+        public float? ShapeAngle { get; set; }
+        public Vector3Data ShapeScale { get; set; }
+        // Renderer
+        public string MaterialPath { get; set; }
+        public string RenderMode { get; set; } // Billboard, Mesh, Stretch, HorizontalBillboard, VerticalBillboard
+    }
+
+    public class PlayParticleSystemRequest
+    {
+        public int InstanceId { get; set; }
+        public string Action { get; set; } // play, stop, pause, restart
+        public bool WithChildren { get; set; } = true;
+    }
+
+    public class ParticleSystemInfoResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public bool IsPlaying { get; set; }
+        public bool IsPaused { get; set; }
+        public bool IsStopped { get; set; }
+        public int ParticleCount { get; set; }
+        public float Time { get; set; }
+        // Main module
+        public float Duration { get; set; }
+        public bool Looping { get; set; }
+        public float StartLifetime { get; set; }
+        public float StartSpeed { get; set; }
+        public float StartSize { get; set; }
+        public ColorData StartColor { get; set; }
+        public int MaxParticles { get; set; }
+        public string SimulationSpace { get; set; }
+        public bool PlayOnAwake { get; set; }
+        public float GravityModifier { get; set; }
+        // Emission
+        public float EmissionRate { get; set; }
+        // Shape
+        public string Shape { get; set; }
+        public float ShapeRadius { get; set; }
+        public float ShapeAngle { get; set; }
+    }
 }
