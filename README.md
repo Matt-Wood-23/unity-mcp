@@ -6,7 +6,7 @@ An MCP (Model Context Protocol) server that enables AI assistants like Claude to
 
 ## Features
 
-- **69 MCP Tools** for comprehensive Unity Editor control
+- **98 MCP Tools** for comprehensive Unity Editor control
 - **Real-time scene inspection** - View hierarchy, components, and properties
 - **Full CRUD operations** - Create, modify, delete GameObjects and components
 - **Material system** - Create, modify, and assign materials
@@ -14,13 +14,21 @@ An MCP (Model Context Protocol) server that enables AI assistants like Claude to
 - **Play mode control** - Start, stop, pause, and step through gameplay
 - **Screenshot capture** - Capture Scene or Game view as base64 images (AI-viewable)
 - **C# code execution** - Run arbitrary C# at runtime — the universal escape hatch
-- **UI System (UGUI)** - Canvas, Text, Button, Image, Slider, InputField, and more
+- **UI System (UGUI + TextMeshPro)** - Canvas, Button, Slider, InputField, TMP text
 - **Lighting & Environment** - Create/modify lights, control skybox, ambient, and fog
-- **Physics** - Add Rigidbodies and colliders, configure global physics settings
-- **Animation** - Inspect Animator state/parameters, set parameters, play clips
+- **Physics (3D & 2D)** - Rigidbodies, colliders, Rigidbody2D, Collider2D
+- **Animation** - Animator control, create clips, add keyframes to curves
 - **Prefab workflow** - Create, unpack, apply/revert overrides
 - **Particle Systems** - Create, configure, and control particle effects
 - **Terrain tools** - Create, sculpt, paint, and populate terrain
+- **Tilemap** - Create Grid/Tilemap, set and fill tiles
+- **Audio** - Add/configure AudioSource, load clips, control playback
+- **Camera** - FOV, clipping planes, projection, culling mask, render texture
+- **NavMesh** - Bake, NavMeshAgent, NavMeshObstacle
+- **Build pipeline** - Get/set build scenes, switch target platform, trigger builds
+- **Post-processing (URP)** - Bloom, Color Adjustments, Vignette, Depth of Field, Tonemapping
+- **Layers & Tags** - Create new layers and tags at runtime
+- **Console filtering** - Filter logs by type, search text, and count; clear console
 - **Batch operations** - Modify or delete multiple GameObjects at once
 - **Profiler data** - Memory, rendering, object counts, and physics stats
 - **Undo/Redo support** - All write operations are undoable
@@ -81,7 +89,15 @@ Add to your MCP settings file (`~/.claude.json` or via settings UI):
 
 Restart Claude Code after adding the configuration.
 
-## Available Tools (69 Total)
+### Optional: TextMeshPro
+
+Add `UNITY_TEXTMESHPRO` to **Project Settings → Player → Scripting Define Symbols** to enable TMP tools. TextMeshPro ships with Unity 6 by default.
+
+### Optional: Post-Processing (URP)
+
+Add `USING_URP` to **Project Settings → Player → Scripting Define Symbols** to enable Volume/post-processing tools. Requires the Universal Render Pipeline package.
+
+## Available Tools (98 Total)
 
 ### Scene & Hierarchy
 
@@ -154,7 +170,8 @@ Restart Claude Code after adding the configuration.
 | `unity_set_playmode` | Control play mode (play, stop, pause, step) |
 | `unity_undo` | Undo the last operation |
 | `unity_redo` | Redo the last undone operation |
-| `unity_get_console` | Get recent console logs, warnings, and errors |
+| `unity_get_console` | Get console logs with optional type/search/count filtering |
+| `unity_clear_console` | Clear all Unity console logs |
 
 ### Screenshot Capture
 
@@ -175,6 +192,15 @@ Restart Claude Code after adding the configuration.
 | `unity_create_ui_element` | Create UI elements: Canvas, Text, Button, Image, Panel, InputField, Slider, Toggle, Dropdown, ScrollView, RawImage |
 | `unity_modify_ui_element` | Modify UI element properties (text, color, size, anchors, interactable state) |
 
+### TextMeshPro
+
+> Requires `UNITY_TEXTMESHPRO` scripting define symbol
+
+| Tool                    | Description                                                           |
+|-------------------------|-----------------------------------------------------------------------|
+| `unity_create_tmp_text` | Create a TextMeshPro text object (UI or world-space)                  |
+| `unity_modify_tmp_text` | Modify TMP text content, size, color, alignment, bold/italic, spacing |
+
 ### Lighting & Environment
 
 | Tool | Description |
@@ -185,7 +211,7 @@ Restart Claude Code after adding the configuration.
 | `unity_set_environment` | Set skybox, ambient mode/colors, fog, and reflection intensity |
 | `unity_get_environment` | Read all current RenderSettings values |
 
-### Physics
+### Physics (3D)
 
 | Tool | Description |
 |------|-------------|
@@ -194,13 +220,53 @@ Restart Claude Code after adding the configuration.
 | `unity_set_physics_settings` | Modify global physics: gravity, solver iterations, thresholds |
 | `unity_get_physics_settings` | Read current global physics configuration |
 
-### Animation
+### Physics (2D)
+
+| Tool                    | Description                                                             |
+|-------------------------|-------------------------------------------------------------------------|
+| `unity_add_rigidbody2d` | Add/configure Rigidbody2D (mass, gravity scale, body type, constraints) |
+| `unity_add_collider2d`  | Add a Box, Circle, Capsule, Polygon, or Edge Collider2D                 |
+
+### Animation (Animator)
 
 | Tool | Description |
 |------|-------------|
 | `unity_get_animator_info` | Get Animator parameters, layers, clips, and current state |
 | `unity_set_animator_parameter` | Set a float, int, bool, or trigger parameter (Play mode) |
 | `unity_play_animation` | Play a named animation state on a specific layer (Play mode) |
+
+### Animation Clips
+
+| Tool | Description |
+|------|-------------|
+| `unity_create_animation_clip` | Create a new AnimationClip asset with configurable frame rate and loop |
+| `unity_add_keyframes` | Add animation curve keyframes to any property (position, rotation, scale, etc.) |
+| `unity_get_animation_clip_info` | Read clip length, frame rate, loop setting, and all curve bindings |
+
+### Audio
+
+| Tool | Description |
+|------|-------------|
+| `unity_add_audio_source` | Add/configure AudioSource: clip, volume, pitch, loop, 2D/3D spatial blend, rolloff |
+| `unity_modify_audio_source` | Modify existing AudioSource properties |
+| `unity_get_audio_source` | Read all AudioSource properties and playback state |
+| `unity_play_audio` | Play, stop, pause, or unpause an AudioSource (Play mode) |
+
+### Camera
+
+| Tool                    | Description                                                                          |
+|-------------------------|--------------------------------------------------------------------------------------|
+| `unity_get_camera_info` | Read Camera properties: FOV, clipping, projection, culling mask, render texture      |
+| `unity_modify_camera`    | Modify any Camera property (FOV, near/far clip, projection type, clear flags, etc.) |
+
+### NavMesh & AI
+
+| Tool | Description |
+|------|-------------|
+| `unity_bake_navmesh` | Bake the NavMesh for the current scene |
+| `unity_clear_navmesh` | Clear all baked NavMesh data |
+| `unity_add_navmesh_agent` | Add/configure NavMeshAgent (speed, radius, stopping distance, avoidance) |
+| `unity_add_navmesh_obstacle` | Add NavMeshObstacle with optional carving (Capsule or Box shape) |
 
 ### Particle Systems
 
@@ -220,6 +286,50 @@ Restart Claude Code after adding the configuration.
 | `unity_slice_spritesheet` | Slice a sprite sheet into multiple sprites by grid |
 | `unity_create_sprite_renderer` | Add a SpriteRenderer to a GameObject with a specified sprite |
 
+### Tilemap
+
+| Tool | Description |
+|------|-------------|
+| `unity_create_tilemap` | Create a Tilemap with a Grid parent for 2D tile-based levels |
+| `unity_set_tile` | Set or clear a single tile at a cell coordinate |
+| `unity_fill_tiles` | Fill a rectangular region with a tile (or clear it) |
+
+### Terrain
+
+| Tool | Description |
+|------|-------------|
+| `unity_create_terrain` | Create a terrain with specified dimensions and resolution |
+| `unity_modify_terrain_height` | Modify terrain heightmap (set, raise, lower, smooth, flatten, perlin noise) |
+| `unity_paint_terrain_texture` | Add terrain texture layers and paint them on the terrain |
+| `unity_place_terrain_trees` | Scatter trees on terrain with configurable density, scale, and area |
+| `unity_get_terrain_info` | Get terrain info: size, resolution, layers, tree prototypes |
+
+### Layers & Tags
+
+| Tool | Description |
+|------|-------------|
+| `unity_get_layers_and_tags` | List all defined layers (index + name) and tags in the project |
+| `unity_add_layer` | Add a new layer (finds first free slot in layers 8–31) |
+| `unity_add_tag` | Add a new tag to the project |
+
+### Build Pipeline
+
+| Tool | Description |
+|------|-------------|
+| `unity_get_build_settings` | Get active build target, scene list, and development flags |
+| `unity_set_build_scenes` | Set or append scenes to the build scene list |
+| `unity_switch_build_target` | Switch the active build target platform |
+| `unity_build_player` | Trigger a player build; returns result, size, and error/warning counts |
+
+### Post-Processing (URP)
+
+> Requires `USING_URP` scripting define symbol
+
+| Tool | Description |
+|------|-------------|
+| `unity_create_volume` | Create a post-processing Volume with a new VolumeProfile (global or local) |
+| `unity_modify_volume` | Configure Bloom, Color Adjustments, Vignette, Depth of Field, Tonemapping, Motion Blur, Film Grain |
+
 ### Profiler & Performance
 
 | Tool | Description |
@@ -232,16 +342,6 @@ Restart Claude Code after adding the configuration.
 |------|-------------|
 | `unity_batch_modify` | Modify multiple GameObjects at once (by IDs or filter). Set tag, layer, active state, transform, add/remove components |
 | `unity_batch_delete` | Delete multiple GameObjects at once (by IDs or filter) |
-
-### Terrain
-
-| Tool | Description |
-|------|-------------|
-| `unity_create_terrain` | Create a terrain with specified dimensions and resolution |
-| `unity_modify_terrain_height` | Modify terrain heightmap (set, raise, lower, smooth, flatten, perlin noise) |
-| `unity_paint_terrain_texture` | Add terrain texture layers and paint them on the terrain |
-| `unity_place_terrain_trees` | Scatter trees on terrain with configurable density, scale, and area |
-| `unity_get_terrain_info` | Get terrain info: size, resolution, layers, tree prototypes |
 
 ## Example Usage
 
@@ -257,72 +357,84 @@ Once configured, you can use natural language with Claude:
 - "Add a Sphere named 'Ball' as a child of the Player"
 - "Instantiate the Enemy prefab at the spawn point"
 
-**Modifying Objects:**
-- "Move the Player to position (10, 0, 5)"
-- "Add a Rigidbody to the Cube and set its mass to 5"
-- "Change the light intensity to 2.5"
-
 **Materials:**
 - "Create a blue metallic material called 'Ocean'"
 - "Assign the Glass material to all windows"
 - "Make the floor material more reflective"
+
+**Audio:**
+- "Add an AudioSource to the Player with the footsteps clip"
+- "Make the music loop and set volume to 0.8"
+- "Set the gunshot sound to 3D with max distance 30"
+
+**Camera:**
+- "Set the main camera FOV to 75"
+- "Switch the camera to orthographic projection"
+- "Set the camera background to solid black"
+
+**Animation Clips:**
+- "Create a new animation clip called 'Bob' that loops"
+- "Add keyframes to move the lantern up and down over 2 seconds"
+- "What curves does the Walk animation have?"
+
+**NavMesh & AI:**
+- "Bake the NavMesh for this scene"
+- "Add a NavMeshAgent to the Enemy with speed 4 and stopping distance 1.5"
+- "Make the rock a NavMesh obstacle that carves the mesh"
+
+**2D Physics:**
+- "Add a Rigidbody2D to the Player with gravity scale 2"
+- "Add a circle collider to the coin"
+- "Make the platform a static Rigidbody2D"
+
+**Tilemap:**
+- "Create a new tilemap called 'Ground'"
+- "Fill the region from (-10,-1) to (10,-1) with the grass tile"
+- "Clear the tile at position (3, 2)"
+
+**Layers & Tags:**
+- "What layers are defined in this project?"
+- "Add a new layer called 'Interactable'"
+- "Add an 'NPC' tag to the project"
+
+**Build Pipeline:**
+- "What scenes are in the build?"
+- "Add the GameOver scene to the build"
+- "Switch the build target to Android"
+- "Build the project to Builds/Windows/MyGame.exe"
+
+**Post-Processing:**
+- "Create a global post-processing volume"
+- "Enable bloom with intensity 1.5"
+- "Add a subtle vignette and ACES tonemapping"
+- "Set contrast to 20 and saturation to -10 for a desaturated look"
+
+**Console:**
+- "Show me only the errors from the console"
+- "Find any console logs mentioning 'NullReference'"
+- "Clear the console"
 
 **Play Mode:**
 - "Start play mode"
 - "Pause the game"
 - "Step one frame forward"
 
-**Scene Management:**
-- "Save the current scene"
-- "Load the MainMenu scene"
-- "What scenes are in this project?"
-
-**Screenshot & Inspection:**
-- "Take a screenshot of the game view"
-- "Show me what the scene looks like from the scene camera"
-- "Get the profiler data and memory usage"
-
-**Code Execution:**
-- "Run this C# code: Debug.Log(Camera.main.transform.position);"
-- "Execute code to print all shader names in the project"
-
-**UI System:**
-- "Create a Canvas with a title text saying 'Game Over'"
-- "Add a Start Button to the main menu canvas"
-- "Create a health bar slider"
-
 **Lighting & Environment:**
 - "Add a warm point light above the player"
-- "Change the directional light to soft shadows"
 - "Enable fog with a light grey color and 0.02 density"
 - "Set the ambient light to a dark blue for a night scene"
 
 **Physics:**
-
 - "Add a Rigidbody to the Barrel with mass 5 and no gravity"
-- "Add a box collider to the Platform"
 - "Set gravity to zero for a space game"
-- "Make the Bullet use continuous collision detection"
-
-**Animation:**
-
-- "What parameters does the Player's Animator have?"
-- "Set the 'Speed' float parameter to 3.5"
-- "Trigger the 'Jump' animation"
 
 **Prefab Workflow:**
-
 - "Save the Player GameObject as a prefab at Assets/Prefabs/Player.prefab"
 - "Apply all the changes I made to the Enemy instance back to the prefab"
-- "Revert the Boss object to its original prefab state"
-- "Unpack the Door prefab so I can edit it freely"
 
 **Particle Systems:**
-
 - "Create a fire particle system at the torch position"
-- "Make the explosion particles faster with a larger spread angle"
 - "Set the smoke emission rate to 50 particles per second"
-- "Play the sparkle effect"
 
 **Batch Operations:**
 - "Disable all GameObjects tagged 'Enemy'"
@@ -332,7 +444,6 @@ Once configured, you can use natural language with Claude:
 **Terrain:**
 - "Create a 1000x1000 terrain"
 - "Apply perlin noise to the terrain heightmap"
-- "Paint grass texture on the terrain"
 - "Scatter 200 trees across the terrain"
 
 ## API Reference
@@ -348,10 +459,11 @@ Once configured, you can use natural language with Claude:
 - `/components?id={instanceId}` - Component list
 - `/assets?filter={filter}` - Asset search
 - `/scripts?filter={filter}` - Script list
-- `/console` - Console logs
+- `/console?type={type}&search={text}&count={n}` - Console logs (filtered)
 - `/selection` - Current selection
 - `/material?path={path}` - Material info
 - `/profiler` - Performance and profiling data
+- `/editor/layers-and-tags` - All layers and tags
 
 **POST Endpoints:**
 - `/gameobject/create` - Create GameObject
@@ -374,6 +486,7 @@ Once configured, you can use natural language with Claude:
 - `/undo` - Perform undo
 - `/redo` - Perform redo
 - `/assets/refresh` - Refresh Asset Database
+- `/console/clear` - Clear console logs
 - `/material/create` - Create material
 - `/material/modify` - Modify material
 - `/material/assign` - Assign material
@@ -385,6 +498,8 @@ Once configured, you can use natural language with Claude:
 - `/code/execute` - Execute C# code
 - `/ui/create` - Create UI element
 - `/ui/modify` - Modify UI element
+- `/tmp/create` - Create TextMeshPro text
+- `/tmp/modify` - Modify TextMeshPro text
 - `/light/create` - Create light
 - `/light/modify` - Modify light
 - `/light/info` - Get light info
@@ -394,15 +509,42 @@ Once configured, you can use natural language with Claude:
 - `/physics/collider` - Add collider
 - `/physics/settings/set` - Set global physics settings
 - `/physics/settings/get` - Get global physics settings
+- `/physics2d/rigidbody` - Add/configure Rigidbody2D
+- `/physics2d/collider` - Add 2D collider
 - `/animator/info` - Get Animator info
 - `/animator/parameter` - Set Animator parameter
 - `/animator/play` - Play animation state
+- `/animation/clip/create` - Create AnimationClip asset
+- `/animation/clip/keyframes` - Add keyframes to a clip curve
+- `/animation/clip/info` - Get clip info and curve bindings
+- `/audio/source/add` - Add/configure AudioSource
+- `/audio/source/modify` - Modify AudioSource
+- `/audio/source/info` - Get AudioSource info
+- `/audio/source/play` - Control AudioSource playback
+- `/camera/info` - Get Camera properties
+- `/camera/modify` - Modify Camera properties
+- `/navmesh/bake` - Bake NavMesh
+- `/navmesh/clear` - Clear NavMesh
+- `/navmesh/agent/add` - Add/configure NavMeshAgent
+- `/navmesh/obstacle/add` - Add NavMeshObstacle
 - `/particles/create` - Create particle system
 - `/particles/modify` - Modify particle system
 - `/particles/play` - Control particle system playback
 - `/particles/info` - Get particle system info
+- `/tilemap/create` - Create Grid + Tilemap
+- `/tilemap/tile/set` - Set/clear a single tile
+- `/tilemap/tile/fill` - Fill a rectangular tile region
+- `/editor/layer/add` - Add a new layer
+- `/editor/tag/add` - Add a new tag
+- `/editor/layers-and-tags` - Get all layers and tags
 - `/batch/modify` - Batch modify GameObjects
 - `/batch/delete` - Batch delete GameObjects
+- `/build/settings` - Get build settings
+- `/build/scenes` - Set build scene list
+- `/build/target` - Switch build target
+- `/build/player` - Trigger a player build
+- `/postprocessing/create` - Create post-processing Volume
+- `/postprocessing/modify` - Modify Volume effects
 - `/terrain/create` - Create terrain
 - `/terrain/height` - Modify terrain heightmap
 - `/terrain/paint` - Paint terrain textures
@@ -443,6 +585,14 @@ The server automatically handles Unity's script recompilation and restarts grace
 
 - `linearDamping` and `angularDamping` replace the deprecated `drag` and `angularDrag` from Unity 6+
 
+### TextMeshPro tools return "not installed"
+
+Add `UNITY_TEXTMESHPRO` to **Project Settings → Player → Scripting Define Symbols**.
+
+### Post-processing tools return "not available"
+
+Add `USING_URP` to **Project Settings → Player → Scripting Define Symbols**. Requires the Universal Render Pipeline package.
+
 ## Project Structure
 
 ```
@@ -457,7 +607,7 @@ UnityMCP/
 │           ├── Providers/
 │           │   ├── SceneDataProvider.cs
 │           │   ├── AssetDataProvider.cs
-│           │   ├── ConsoleDataProvider.cs
+│           │   ├── ConsoleDataProvider.cs  # Filterable console logs
 │           │   ├── ProjectDataProvider.cs
 │           │   ├── SelectionDataProvider.cs
 │           │   ├── ScreenshotProvider.cs
@@ -476,8 +626,18 @@ UnityMCP/
 │               ├── LightingHandler.cs
 │               ├── PhysicsHandler.cs
 │               ├── AnimationHandler.cs
+│               ├── AnimationClipHandler.cs
 │               ├── PrefabHandler.cs
-│               └── ParticleSystemHandler.cs
+│               ├── ParticleSystemHandler.cs
+│               ├── AudioHandler.cs
+│               ├── CameraHandler.cs
+│               ├── TextMeshProHandler.cs
+│               ├── LayerTagHandler.cs
+│               ├── NavMeshHandler.cs
+│               ├── Physics2DHandler.cs
+│               ├── TilemapHandler.cs
+│               ├── BuildHandler.cs
+│               └── PostProcessingHandler.cs
 └── unity-mcp-server/
     ├── package.json
     ├── tsconfig.json
@@ -488,12 +648,13 @@ UnityMCP/
 
 ## Contributing
 
-Contributions are welcome! Some ideas for extensions:
+Contributions are welcome! Some ideas for future extensions:
 
-- [ ] Audio system tools (AudioSource, AudioMixer)
-- [ ] Script file management (create/read/write .cs files)
-- [ ] NavMesh/AI navigation (bake, NavMeshAgent)
-- [ ] Build pipeline integration
+- [ ] LOD Groups (add LOD levels, set distances)
+- [ ] Occlusion culling (bake/clear occlusion data)
+- [ ] Timeline (create tracks and clips)
+- [ ] XR/VR tools (XR Origin, XR Interactables, teleportation)
+- [ ] Layer collision matrix
 - [ ] Test runner integration
 
 ## License
