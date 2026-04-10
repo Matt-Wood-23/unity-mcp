@@ -55,8 +55,17 @@ export class UnityClient {
     return this.get(`/scripts${query}`);
   }
 
-  async getConsoleLogs(): Promise<any> {
-    return this.get("/console");
+  async getConsoleLogs(options?: { type?: string; search?: string; count?: number }): Promise<any> {
+    const params = new URLSearchParams();
+    if (options?.type) params.set("type", options.type);
+    if (options?.search) params.set("search", options.search);
+    if (options?.count !== undefined) params.set("count", String(options.count));
+    const query = params.toString() ? `?${params}` : "";
+    return this.get(`/console${query}`);
+  }
+
+  async clearConsole(): Promise<any> {
+    return this.post("/console/clear", {});
   }
 
   async getCurrentSelection(): Promise<any> {
@@ -967,6 +976,470 @@ export class UnityClient {
 
   async getParticleSystemInfo(instanceId: number): Promise<any> {
     return this.post("/particles/info", { InstanceId: instanceId });
+  }
+
+  // Audio operations
+  async addAudioSource(options: {
+    instanceId: number;
+    clipPath?: string;
+    volume?: number;
+    pitch?: number;
+    loop?: boolean;
+    playOnAwake?: boolean;
+    mute?: boolean;
+    spatialBlend?: number;
+    minDistance?: number;
+    maxDistance?: number;
+    priority?: number;
+    stereoPan?: number;
+    rolloffMode?: string;
+  }): Promise<any> {
+    return this.post("/audio/source/add", {
+      InstanceId: options.instanceId,
+      ClipPath: options.clipPath,
+      Volume: options.volume ?? 1,
+      Pitch: options.pitch ?? 1,
+      Loop: options.loop ?? false,
+      PlayOnAwake: options.playOnAwake ?? true,
+      Mute: options.mute ?? false,
+      SpatialBlend: options.spatialBlend ?? 0,
+      MinDistance: options.minDistance ?? 1,
+      MaxDistance: options.maxDistance ?? 500,
+      Priority: options.priority ?? 128,
+      StereoPan: options.stereoPan ?? 0,
+      RolloffMode: options.rolloffMode,
+    });
+  }
+
+  async modifyAudioSource(options: {
+    instanceId: number;
+    clipPath?: string;
+    volume?: number;
+    pitch?: number;
+    loop?: boolean;
+    playOnAwake?: boolean;
+    mute?: boolean;
+    spatialBlend?: number;
+    minDistance?: number;
+    maxDistance?: number;
+    priority?: number;
+    stereoPan?: number;
+    reverbZoneMix?: number;
+    rolloffMode?: string;
+  }): Promise<any> {
+    return this.post("/audio/source/modify", {
+      InstanceId: options.instanceId,
+      ClipPath: options.clipPath,
+      Volume: options.volume,
+      Pitch: options.pitch,
+      Loop: options.loop,
+      PlayOnAwake: options.playOnAwake,
+      Mute: options.mute,
+      SpatialBlend: options.spatialBlend,
+      MinDistance: options.minDistance,
+      MaxDistance: options.maxDistance,
+      Priority: options.priority,
+      StereoPan: options.stereoPan,
+      ReverbZoneMix: options.reverbZoneMix,
+      RolloffMode: options.rolloffMode,
+    });
+  }
+
+  async getAudioSourceInfo(instanceId: number): Promise<any> {
+    return this.post("/audio/source/info", { InstanceId: instanceId });
+  }
+
+  async playAudio(instanceId: number, action: "play" | "stop" | "pause" | "unpause"): Promise<any> {
+    return this.post("/audio/source/play", { InstanceId: instanceId, Action: action });
+  }
+
+  // Camera operations
+  async getCameraInfo(instanceId: number): Promise<any> {
+    return this.post("/camera/info", { InstanceId: instanceId });
+  }
+
+  async modifyCamera(options: {
+    instanceId: number;
+    fieldOfView?: number;
+    nearClipPlane?: number;
+    farClipPlane?: number;
+    projectionType?: string;
+    orthographicSize?: number;
+    depth?: number;
+    cullingMask?: number;
+    clearFlags?: string;
+    backgroundColor?: { r: number; g: number; b: number; a?: number };
+    renderTexturePath?: string;
+    clearRenderTexture?: boolean;
+    allowHDR?: boolean;
+    allowMSAA?: boolean;
+  }): Promise<any> {
+    return this.post("/camera/modify", {
+      InstanceId: options.instanceId,
+      FieldOfView: options.fieldOfView,
+      NearClipPlane: options.nearClipPlane,
+      FarClipPlane: options.farClipPlane,
+      ProjectionType: options.projectionType,
+      OrthographicSize: options.orthographicSize,
+      Depth: options.depth,
+      CullingMask: options.cullingMask,
+      ClearFlags: options.clearFlags,
+      BackgroundColor: options.backgroundColor,
+      RenderTexturePath: options.renderTexturePath,
+      ClearRenderTexture: options.clearRenderTexture,
+      AllowHDR: options.allowHDR,
+      AllowMSAA: options.allowMSAA,
+    });
+  }
+
+  // TextMeshPro operations
+  async createTMPText(options: {
+    name?: string;
+    parentId?: number;
+    text?: string;
+    fontSize?: number;
+    color?: { r: number; g: number; b: number; a?: number };
+    alignment?: string;
+    anchoredPosition?: { x: number; y: number };
+    sizeDelta?: { x: number; y: number };
+    isWorldSpace?: boolean;
+    position?: { x: number; y: number; z: number };
+    rotation?: { x: number; y: number; z: number };
+  }): Promise<any> {
+    return this.post("/tmp/create", {
+      Name: options.name,
+      ParentId: options.parentId,
+      Text: options.text,
+      FontSize: options.fontSize,
+      Color: options.color,
+      Alignment: options.alignment,
+      AnchoredPosition: options.anchoredPosition,
+      SizeDelta: options.sizeDelta,
+      IsWorldSpace: options.isWorldSpace ?? false,
+      Position: options.position,
+      Rotation: options.rotation,
+    });
+  }
+
+  async modifyTMPText(options: {
+    instanceId: number;
+    text?: string;
+    fontSize?: number;
+    color?: { r: number; g: number; b: number; a?: number };
+    alignment?: string;
+    bold?: boolean;
+    italic?: boolean;
+    characterSpacing?: number;
+    lineSpacing?: number;
+    autoSizeFont?: boolean;
+    wordWrapping?: boolean;
+  }): Promise<any> {
+    return this.post("/tmp/modify", {
+      InstanceId: options.instanceId,
+      Text: options.text,
+      FontSize: options.fontSize,
+      Color: options.color,
+      Alignment: options.alignment,
+      Bold: options.bold,
+      Italic: options.italic,
+      CharacterSpacing: options.characterSpacing,
+      LineSpacing: options.lineSpacing,
+      AutoSizeFont: options.autoSizeFont,
+      WordWrapping: options.wordWrapping,
+    });
+  }
+
+  // Layer/Tag operations
+  async getLayersAndTags(): Promise<any> {
+    return this.get("/editor/layers-and-tags");
+  }
+
+  async addLayer(layerName: string): Promise<any> {
+    return this.post("/editor/layer/add", { LayerName: layerName });
+  }
+
+  async addTag(tagName: string): Promise<any> {
+    return this.post("/editor/tag/add", { TagName: tagName });
+  }
+
+  // NavMesh operations
+  async bakeNavMesh(): Promise<any> {
+    return this.post("/navmesh/bake", {});
+  }
+
+  async clearNavMesh(): Promise<any> {
+    return this.post("/navmesh/clear", {});
+  }
+
+  async addNavMeshAgent(options: {
+    instanceId: number;
+    speed?: number;
+    angularSpeed?: number;
+    acceleration?: number;
+    stoppingDistance?: number;
+    radius?: number;
+    height?: number;
+    autoBraking?: boolean;
+    autoRepath?: boolean;
+    obstacleAvoidanceType?: number;
+  }): Promise<any> {
+    return this.post("/navmesh/agent/add", {
+      InstanceId: options.instanceId,
+      Speed: options.speed,
+      AngularSpeed: options.angularSpeed,
+      Acceleration: options.acceleration,
+      StoppingDistance: options.stoppingDistance,
+      Radius: options.radius,
+      Height: options.height,
+      AutoBraking: options.autoBraking,
+      AutoRepath: options.autoRepath,
+      ObstacleAvoidanceType: options.obstacleAvoidanceType,
+    });
+  }
+
+  async addNavMeshObstacle(options: {
+    instanceId: number;
+    shape?: string;
+    radius?: number;
+    height?: number;
+    center?: { x: number; y: number; z: number };
+    size?: { x: number; y: number; z: number };
+    carve?: boolean;
+    carveOnlyStationary?: boolean;
+  }): Promise<any> {
+    return this.post("/navmesh/obstacle/add", {
+      InstanceId: options.instanceId,
+      Shape: options.shape,
+      Radius: options.radius,
+      Height: options.height,
+      Center: options.center,
+      Size: options.size,
+      Carve: options.carve,
+      CarveOnlyStationary: options.carveOnlyStationary,
+    });
+  }
+
+  // 2D Physics operations
+  async addRigidbody2D(options: {
+    instanceId: number;
+    mass?: number;
+    linearDrag?: number;
+    angularDrag?: number;
+    gravityScale?: number;
+    isKinematic?: boolean;
+    bodyType?: string;
+    collisionDetection?: string;
+    interpolation?: string;
+    constraints?: string;
+  }): Promise<any> {
+    return this.post("/physics2d/rigidbody", {
+      InstanceId: options.instanceId,
+      Mass: options.mass ?? 1,
+      LinearDrag: options.linearDrag ?? 0,
+      AngularDrag: options.angularDrag ?? 0.05,
+      GravityScale: options.gravityScale ?? 1,
+      IsKinematic: options.isKinematic ?? false,
+      BodyType: options.bodyType,
+      CollisionDetection: options.collisionDetection,
+      Interpolation: options.interpolation,
+      Constraints: options.constraints,
+    });
+  }
+
+  async addCollider2D(options: {
+    instanceId: number;
+    colliderType: string;
+    isTrigger?: boolean;
+    offset?: { x: number; y: number };
+    size?: { x: number; y: number };
+    radius?: number;
+    height?: number;
+    capsuleDirection?: string;
+    physicsMaterialPath?: string;
+  }): Promise<any> {
+    return this.post("/physics2d/collider", {
+      InstanceId: options.instanceId,
+      ColliderType: options.colliderType,
+      IsTrigger: options.isTrigger ?? false,
+      Offset: options.offset,
+      Size: options.size,
+      Radius: options.radius,
+      Height: options.height,
+      CapsuleDirection: options.capsuleDirection,
+      PhysicsMaterialPath: options.physicsMaterialPath,
+    });
+  }
+
+  // Tilemap operations
+  async createTilemap(options: {
+    name?: string;
+    parentId?: number;
+    position?: { x: number; y: number; z: number };
+    cellSize?: number;
+    orientation?: string;
+  }): Promise<any> {
+    return this.post("/tilemap/create", {
+      Name: options.name,
+      ParentId: options.parentId,
+      Position: options.position,
+      CellSize: options.cellSize,
+      Orientation: options.orientation,
+    });
+  }
+
+  async setTile(options: {
+    instanceId: number;
+    x: number;
+    y: number;
+    z?: number;
+    tilePath?: string;
+  }): Promise<any> {
+    return this.post("/tilemap/tile/set", {
+      InstanceId: options.instanceId,
+      X: options.x,
+      Y: options.y,
+      Z: options.z ?? 0,
+      TilePath: options.tilePath,
+    });
+  }
+
+  async fillTiles(options: {
+    instanceId: number;
+    xMin: number;
+    yMin: number;
+    xMax: number;
+    yMax: number;
+    tilePath?: string;
+  }): Promise<any> {
+    return this.post("/tilemap/tile/fill", {
+      InstanceId: options.instanceId,
+      XMin: options.xMin,
+      YMin: options.yMin,
+      XMax: options.xMax,
+      YMax: options.yMax,
+      TilePath: options.tilePath,
+    });
+  }
+
+  // Animation Clip operations
+  async createAnimationClip(options: {
+    name?: string;
+    savePath?: string;
+    frameRate?: number;
+    isLooping?: boolean;
+  }): Promise<any> {
+    return this.post("/animation/clip/create", {
+      Name: options.name,
+      SavePath: options.savePath,
+      FrameRate: options.frameRate,
+      IsLooping: options.isLooping,
+    });
+  }
+
+  async addKeyframes(options: {
+    clipPath: string;
+    gameObjectPath?: string;
+    bindingType?: string;
+    propertyPath: string;
+    keyframes: Array<{ time: number; value: number }>;
+    smoothTangents?: boolean;
+  }): Promise<any> {
+    return this.post("/animation/clip/keyframes", {
+      ClipPath: options.clipPath,
+      GameObjectPath: options.gameObjectPath,
+      BindingType: options.bindingType,
+      PropertyPath: options.propertyPath,
+      Keyframes: options.keyframes.map(k => ({ Time: k.time, Value: k.value })),
+      SmoothTangents: options.smoothTangents ?? false,
+    });
+  }
+
+  async getAnimationClipInfo(options: { clipPath?: string; instanceId?: number }): Promise<any> {
+    return this.post("/animation/clip/info", {
+      ClipPath: options.clipPath,
+      InstanceId: options.instanceId,
+    });
+  }
+
+  // Build operations
+  async getBuildSettings(): Promise<any> {
+    return this.post("/build/settings", {});
+  }
+
+  async setBuildScenes(options: { scenePaths: string[]; addToExisting?: boolean }): Promise<any> {
+    return this.post("/build/scenes", {
+      ScenePaths: options.scenePaths,
+      AddToExisting: options.addToExisting,
+    });
+  }
+
+  async switchBuildTarget(buildTarget: string): Promise<any> {
+    return this.post("/build/target", { BuildTarget: buildTarget });
+  }
+
+  async buildPlayer(options: {
+    outputPath: string;
+    buildTarget?: string;
+    development?: boolean;
+    autoRunPlayer?: boolean;
+    connectWithProfiler?: boolean;
+  }): Promise<any> {
+    return this.post("/build/player", {
+      OutputPath: options.outputPath,
+      BuildTarget: options.buildTarget,
+      Development: options.development ?? false,
+      AutoRunPlayer: options.autoRunPlayer ?? false,
+      ConnectWithProfiler: options.connectWithProfiler ?? false,
+    });
+  }
+
+  // Post-processing operations
+  async createVolume(options: {
+    name?: string;
+    isGlobal?: boolean;
+    parentId?: number;
+    priority?: number;
+    blendDistance?: number;
+    weight?: number;
+    profileName?: string;
+    profileSavePath?: string;
+  }): Promise<any> {
+    return this.post("/postprocessing/create", {
+      Name: options.name,
+      IsGlobal: options.isGlobal ?? true,
+      ParentId: options.parentId,
+      Priority: options.priority ?? 0,
+      BlendDistance: options.blendDistance ?? 0,
+      Weight: options.weight ?? 1,
+      ProfileName: options.profileName,
+      ProfileSavePath: options.profileSavePath,
+    });
+  }
+
+  async modifyVolume(options: {
+    instanceId: number;
+    bloomEnabled?: boolean; bloomIntensity?: number; bloomThreshold?: number; bloomScatter?: number;
+    colorAdjustmentsEnabled?: boolean; postExposure?: number; contrast?: number; saturation?: number; hueShift?: number;
+    vignetteEnabled?: boolean; vignetteIntensity?: number; vignetteSmoothness?: number;
+    depthOfFieldEnabled?: boolean; focusDistance?: number; aperture?: number; focalLength?: number;
+    tonemappingEnabled?: boolean; tonemappingMode?: string;
+    motionBlurEnabled?: boolean; motionBlurIntensity?: number;
+    filmGrainEnabled?: boolean; filmGrainIntensity?: number;
+  }): Promise<any> {
+    return this.post("/postprocessing/modify", {
+      InstanceId: options.instanceId,
+      BloomEnabled: options.bloomEnabled, BloomIntensity: options.bloomIntensity,
+      BloomThreshold: options.bloomThreshold, BloomScatter: options.bloomScatter,
+      ColorAdjustmentsEnabled: options.colorAdjustmentsEnabled, PostExposure: options.postExposure,
+      Contrast: options.contrast, Saturation: options.saturation, HueShift: options.hueShift,
+      VignetteEnabled: options.vignetteEnabled, VignetteIntensity: options.vignetteIntensity,
+      VignetteSmoothness: options.vignetteSmoothness,
+      DepthOfFieldEnabled: options.depthOfFieldEnabled, FocusDistance: options.focusDistance,
+      Aperture: options.aperture, FocalLength: options.focalLength,
+      TonemappingEnabled: options.tonemappingEnabled, TonemappingMode: options.tonemappingMode,
+      MotionBlurEnabled: options.motionBlurEnabled, MotionBlurIntensity: options.motionBlurIntensity,
+      FilmGrainEnabled: options.filmGrainEnabled, FilmGrainIntensity: options.filmGrainIntensity,
+    });
   }
 
   private async get(endpoint: string): Promise<any> {

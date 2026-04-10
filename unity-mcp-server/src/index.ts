@@ -115,10 +115,23 @@ const tools = [
   {
     name: "unity_get_console",
     description:
-      "Get recent Unity console logs including errors, warnings, and info messages",
+      "Get Unity console logs. Supports filtering by type, text search, and limiting count.",
     inputSchema: {
       type: "object" as const,
-      properties: {},
+      properties: {
+        type: {
+          type: "string",
+          description: "Filter by log type: 'Error', 'Warning', 'Log', 'Exception', or comma-separated list e.g. 'Error,Exception'",
+        },
+        search: {
+          type: "string",
+          description: "Filter logs containing this text (case-insensitive, searches message and stack trace)",
+        },
+        count: {
+          type: "number",
+          description: "Maximum number of (most recent) logs to return (default 100)",
+        },
+      },
     },
   },
   {
@@ -1765,6 +1778,473 @@ const tools = [
       properties: {},
     },
   },
+
+  // Console
+  {
+    name: "unity_clear_console",
+    description: "Clear all Unity console logs",
+    inputSchema: { type: "object" as const, properties: {} },
+  },
+
+  // Audio
+  {
+    name: "unity_add_audio_source",
+    description: "Add or configure an AudioSource component on a GameObject. Set clip, volume, pitch, loop, spatial blend (0=2D, 1=3D), rolloff distances, and more.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        clipPath: { type: "string", description: "Asset path to AudioClip (e.g. 'Assets/Audio/music.mp3')" },
+        volume: { type: "number", description: "Volume 0-1 (default 1)" },
+        pitch: { type: "number", description: "Pitch multiplier (default 1)" },
+        loop: { type: "boolean", description: "Loop the clip" },
+        playOnAwake: { type: "boolean", description: "Play automatically on scene start (default true)" },
+        mute: { type: "boolean", description: "Mute the source" },
+        spatialBlend: { type: "number", description: "0=fully 2D, 1=fully 3D (default 0)" },
+        minDistance: { type: "number", description: "Min distance for 3D attenuation (default 1)" },
+        maxDistance: { type: "number", description: "Max distance for 3D attenuation (default 500)" },
+        priority: { type: "number", description: "Priority 0 (highest) to 256 (lowest), default 128" },
+        stereoPan: { type: "number", description: "Stereo pan -1 (left) to 1 (right), default 0" },
+        rolloffMode: { type: "string", description: "Logarithmic (default), Linear, or Custom" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_modify_audio_source",
+    description: "Modify existing AudioSource properties. Only specified properties are changed.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        clipPath: { type: "string", description: "New AudioClip asset path" },
+        volume: { type: "number" },
+        pitch: { type: "number" },
+        loop: { type: "boolean" },
+        playOnAwake: { type: "boolean" },
+        mute: { type: "boolean" },
+        spatialBlend: { type: "number" },
+        minDistance: { type: "number" },
+        maxDistance: { type: "number" },
+        priority: { type: "number" },
+        stereoPan: { type: "number" },
+        reverbZoneMix: { type: "number" },
+        rolloffMode: { type: "string" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_get_audio_source",
+    description: "Get all AudioSource properties on a GameObject including clip, volume, spatial settings, and playback state",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_play_audio",
+    description: "Control AudioSource playback (Play mode only). Actions: play, stop, pause, unpause",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        action: { type: "string", enum: ["play", "stop", "pause", "unpause"], description: "Playback action" },
+      },
+      required: ["instanceId", "action"],
+    },
+  },
+
+  // Camera
+  {
+    name: "unity_get_camera_info",
+    description: "Get all Camera component properties: FOV, clipping planes, projection type, culling mask, clear flags, depth, render texture",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject with a Camera component" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_modify_camera",
+    description: "Modify Camera component properties: FOV, near/far clip, projection (Perspective/Orthographic), orthographic size, depth, culling mask, clear flags, background color, render texture",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject with a Camera" },
+        fieldOfView: { type: "number", description: "Vertical field of view in degrees (Perspective only)" },
+        nearClipPlane: { type: "number", description: "Near clipping plane distance" },
+        farClipPlane: { type: "number", description: "Far clipping plane distance" },
+        projectionType: { type: "string", enum: ["Perspective", "Orthographic"], description: "Camera projection type" },
+        orthographicSize: { type: "number", description: "Orthographic half-height (Orthographic only)" },
+        depth: { type: "number", description: "Camera rendering depth/order" },
+        cullingMask: { type: "number", description: "Layer mask bitmask for which layers to render" },
+        clearFlags: { type: "string", enum: ["Skybox", "SolidColor", "Depth", "Nothing"], description: "How to clear the background" },
+        backgroundColor: {
+          type: "object",
+          properties: { r: { type: "number" }, g: { type: "number" }, b: { type: "number" }, a: { type: "number" } },
+          description: "Background color (used when clearFlags is SolidColor)",
+        },
+        renderTexturePath: { type: "string", description: "Asset path to a RenderTexture to render into" },
+        clearRenderTexture: { type: "boolean", description: "If true, clears the render texture assignment" },
+        allowHDR: { type: "boolean", description: "Enable HDR rendering" },
+        allowMSAA: { type: "boolean", description: "Enable MSAA anti-aliasing" },
+      },
+      required: ["instanceId"],
+    },
+  },
+
+  // TextMeshPro
+  {
+    name: "unity_create_tmp_text",
+    description: "Create a TextMeshPro text object. Use isWorldSpace=false for UI (Canvas), true for 3D world-space text. Requires TextMeshPro package (included by default in Unity 6). Add UNITY_TEXTMESHPRO to Scripting Define Symbols to enable.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        name: { type: "string", description: "GameObject name" },
+        parentId: { type: "number", description: "Parent Canvas or GameObject instance ID" },
+        text: { type: "string", description: "Text content" },
+        fontSize: { type: "number", description: "Font size" },
+        color: {
+          type: "object",
+          properties: { r: { type: "number" }, g: { type: "number" }, b: { type: "number" }, a: { type: "number" } },
+        },
+        alignment: { type: "string", description: "Text alignment: Left, Center, Right, Justified, Top, Bottom, TopLeft, etc." },
+        isWorldSpace: { type: "boolean", description: "false=UI text (TextMeshProUGUI), true=3D world text (TextMeshPro). Default false." },
+        anchoredPosition: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, description: "UI position (isWorldSpace=false)" },
+        sizeDelta: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, description: "UI rect size (isWorldSpace=false)" },
+        position: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } }, description: "World position (isWorldSpace=true)" },
+        rotation: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } }, description: "World rotation (isWorldSpace=true)" },
+      },
+    },
+  },
+  {
+    name: "unity_modify_tmp_text",
+    description: "Modify TextMeshPro text content, font size, color, alignment, and style (bold, italic, spacing)",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the TextMeshPro GameObject" },
+        text: { type: "string", description: "New text content" },
+        fontSize: { type: "number" },
+        color: { type: "object", properties: { r: { type: "number" }, g: { type: "number" }, b: { type: "number" }, a: { type: "number" } } },
+        alignment: { type: "string", description: "Left, Center, Right, Justified, Top, Bottom, etc." },
+        bold: { type: "boolean" },
+        italic: { type: "boolean" },
+        characterSpacing: { type: "number", description: "Character spacing in em units" },
+        lineSpacing: { type: "number", description: "Line spacing percentage" },
+        autoSizeFont: { type: "boolean", description: "Auto-size font to fit bounds" },
+        wordWrapping: { type: "boolean", description: "Enable word wrapping" },
+      },
+      required: ["instanceId"],
+    },
+  },
+
+  // Layers & Tags
+  {
+    name: "unity_get_layers_and_tags",
+    description: "Get all defined layers (index + name) and tags in the project",
+    inputSchema: { type: "object" as const, properties: {} },
+  },
+  {
+    name: "unity_add_layer",
+    description: "Add a new layer to the project (finds first free slot in layers 8-31). Returns the layer index.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        layerName: { type: "string", description: "Name for the new layer" },
+      },
+      required: ["layerName"],
+    },
+  },
+  {
+    name: "unity_add_tag",
+    description: "Add a new tag to the project",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        tagName: { type: "string", description: "Name for the new tag" },
+      },
+      required: ["tagName"],
+    },
+  },
+
+  // NavMesh
+  {
+    name: "unity_bake_navmesh",
+    description: "Bake the NavMesh for the current scene using current NavMesh settings and scene geometry",
+    inputSchema: { type: "object" as const, properties: {} },
+  },
+  {
+    name: "unity_clear_navmesh",
+    description: "Clear all baked NavMesh data from the current scene",
+    inputSchema: { type: "object" as const, properties: {} },
+  },
+  {
+    name: "unity_add_navmesh_agent",
+    description: "Add or configure a NavMeshAgent on a GameObject for AI pathfinding",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        speed: { type: "number", description: "Maximum movement speed (default 3.5)" },
+        angularSpeed: { type: "number", description: "Maximum rotation speed in degrees/sec (default 120)" },
+        acceleration: { type: "number", description: "Maximum acceleration (default 8)" },
+        stoppingDistance: { type: "number", description: "Stop this far from the target (default 0)" },
+        radius: { type: "number", description: "Agent radius for pathfinding avoidance" },
+        height: { type: "number", description: "Agent height" },
+        autoBraking: { type: "boolean", description: "Brake automatically near destination (default true)" },
+        autoRepath: { type: "boolean", description: "Re-path when path becomes stale (default true)" },
+        obstacleAvoidanceType: { type: "number", description: "Avoidance quality: 0=None, 1=Low, 2=Medium, 3=Good, 4=High" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_add_navmesh_obstacle",
+    description: "Add a NavMeshObstacle to a GameObject so agents avoid it dynamically",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        shape: { type: "string", enum: ["Capsule", "Box"], description: "Obstacle shape (default Capsule)" },
+        radius: { type: "number", description: "Radius (Capsule shape)" },
+        height: { type: "number", description: "Height (Capsule shape)" },
+        center: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } } },
+        size: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } }, description: "Size (Box shape)" },
+        carve: { type: "boolean", description: "If true, carves a hole in the NavMesh (recommended for static obstacles)" },
+        carveOnlyStationary: { type: "boolean", description: "Only carve when obstacle is not moving" },
+      },
+      required: ["instanceId"],
+    },
+  },
+
+  // 2D Physics
+  {
+    name: "unity_add_rigidbody2d",
+    description: "Add or configure a Rigidbody2D component for 2D physics simulation",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        mass: { type: "number", description: "Mass (default 1)" },
+        linearDrag: { type: "number", description: "Linear drag coefficient (default 0)" },
+        angularDrag: { type: "number", description: "Angular drag coefficient (default 0.05)" },
+        gravityScale: { type: "number", description: "Gravity multiplier (default 1, use 0 for top-down)" },
+        isKinematic: { type: "boolean", description: "Kinematic bodies are moved by script, not physics" },
+        bodyType: { type: "string", enum: ["Dynamic", "Kinematic", "Static"], description: "Body type (overrides isKinematic)" },
+        collisionDetection: { type: "string", enum: ["Discrete", "Continuous"], description: "Collision detection mode" },
+        interpolation: { type: "string", enum: ["None", "Interpolate", "Extrapolate"] },
+        constraints: { type: "string", description: "Comma-separated constraints, e.g. 'FreezePositionX,FreezeRotation'" },
+      },
+      required: ["instanceId"],
+    },
+  },
+  {
+    name: "unity_add_collider2d",
+    description: "Add a 2D collider to a GameObject. Types: Box, Circle, Capsule, Polygon, Edge",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the GameObject" },
+        colliderType: { type: "string", enum: ["Box", "Circle", "Capsule", "Polygon", "Edge"], description: "Type of 2D collider" },
+        isTrigger: { type: "boolean", description: "Make this a trigger (no physics response)" },
+        offset: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, description: "Collider center offset" },
+        size: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, description: "Box/Capsule size" },
+        radius: { type: "number", description: "Circle/Capsule radius" },
+        capsuleDirection: { type: "string", enum: ["Vertical", "Horizontal"], description: "Capsule orientation" },
+        physicsMaterialPath: { type: "string", description: "Asset path to PhysicsMaterial2D" },
+      },
+      required: ["instanceId", "colliderType"],
+    },
+  },
+
+  // Tilemap
+  {
+    name: "unity_create_tilemap",
+    description: "Create a Tilemap with a Grid parent for 2D tile-based levels. Returns both the Grid and Tilemap instance IDs.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        name: { type: "string", description: "Name for the tilemap (Grid will be named '<name> Grid')" },
+        parentId: { type: "number", description: "Attach the new tilemap to an existing Grid (skips creating a new Grid)" },
+        position: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } } },
+        cellSize: { type: "number", description: "Cell size (square, default 1)" },
+        orientation: { type: "string", enum: ["XY", "XZ", "HexFlat", "HexPoint"], description: "Grid layout orientation" },
+      },
+    },
+  },
+  {
+    name: "unity_set_tile",
+    description: "Set or clear a single tile in a Tilemap at a given cell coordinate. Pass tilePath=null to clear.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the Tilemap GameObject" },
+        x: { type: "number", description: "Cell X coordinate" },
+        y: { type: "number", description: "Cell Y coordinate" },
+        z: { type: "number", description: "Cell Z coordinate (default 0)" },
+        tilePath: { type: "string", description: "Asset path to Tile asset. Omit or set null to clear the cell." },
+      },
+      required: ["instanceId", "x", "y"],
+    },
+  },
+  {
+    name: "unity_fill_tiles",
+    description: "Fill a rectangular region of a Tilemap with a tile. Omit tilePath to clear the region.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the Tilemap GameObject" },
+        xMin: { type: "number" },
+        yMin: { type: "number" },
+        xMax: { type: "number" },
+        yMax: { type: "number" },
+        tilePath: { type: "string", description: "Asset path to Tile asset. Omit to clear the region." },
+      },
+      required: ["instanceId", "xMin", "yMin", "xMax", "yMax"],
+    },
+  },
+
+  // Animation Clips
+  {
+    name: "unity_create_animation_clip",
+    description: "Create a new AnimationClip asset at the specified path",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        name: { type: "string", description: "Clip name" },
+        savePath: { type: "string", description: "Asset path to save (e.g. 'Assets/Animations/Run.anim')" },
+        frameRate: { type: "number", description: "Frames per second (default 60)" },
+        isLooping: { type: "boolean", description: "Enable loop time" },
+      },
+    },
+  },
+  {
+    name: "unity_add_keyframes",
+    description: "Add keyframes to an AnimationClip curve. Common property paths: 'localPosition.x', 'localPosition.y', 'localPosition.z', 'localEulerAngles.y', 'm_LocalScale.x', 'material._Color.r'",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        clipPath: { type: "string", description: "Asset path to the AnimationClip" },
+        gameObjectPath: { type: "string", description: "Hierarchy path to the child object (empty string = root object)" },
+        bindingType: { type: "string", description: "Component type: Transform (default), Light, Camera, MeshRenderer, SpriteRenderer, AudioSource, Rigidbody" },
+        propertyPath: { type: "string", description: "Property name: e.g. 'localPosition.x', 'm_LocalScale.y', 'localEulerAngles.z'" },
+        keyframes: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: { time: { type: "number", description: "Time in seconds" }, value: { type: "number", description: "Value at this time" } },
+            required: ["time", "value"],
+          },
+          description: "Array of {time, value} keyframes",
+        },
+        smoothTangents: { type: "boolean", description: "Auto-smooth keyframe tangents for curves (default false)" },
+      },
+      required: ["clipPath", "propertyPath", "keyframes"],
+    },
+  },
+  {
+    name: "unity_get_animation_clip_info",
+    description: "Get information about an AnimationClip asset: length, frame rate, loop setting, and all curve bindings",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        clipPath: { type: "string", description: "Asset path to the AnimationClip" },
+        instanceId: { type: "number", description: "Instance ID of the AnimationClip (alternative to clipPath)" },
+      },
+    },
+  },
+
+  // Build Pipeline
+  {
+    name: "unity_get_build_settings",
+    description: "Get current build settings: active build target, scene list with enabled state, development mode flags",
+    inputSchema: { type: "object" as const, properties: {} },
+  },
+  {
+    name: "unity_set_build_scenes",
+    description: "Set the list of scenes included in the build",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        scenePaths: {
+          type: "array",
+          items: { type: "string" },
+          description: "Array of scene asset paths (e.g. ['Assets/Scenes/Main.unity', 'Assets/Scenes/Game.unity']). Accepts scene names or full paths.",
+        },
+        addToExisting: { type: "boolean", description: "If true, appends to the existing scene list instead of replacing it" },
+      },
+      required: ["scenePaths"],
+    },
+  },
+  {
+    name: "unity_switch_build_target",
+    description: "Switch the active build target. This may take a moment as Unity reimports assets. Targets: StandaloneWindows64, StandaloneOSX, StandaloneLinux64, Android, iOS, WebGL",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        buildTarget: { type: "string", description: "Target platform: StandaloneWindows64, StandaloneOSX, StandaloneLinux64, Android, iOS, WebGL, PS4, PS5, XboxOne" },
+      },
+      required: ["buildTarget"],
+    },
+  },
+  {
+    name: "unity_build_player",
+    description: "Trigger a player build. Uses current build target unless overridden. Returns build result, size, and error/warning counts.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        outputPath: { type: "string", description: "Output path for the build (e.g. 'Builds/Windows/MyGame.exe')" },
+        buildTarget: { type: "string", description: "Override build target (optional, uses active target by default)" },
+        development: { type: "boolean", description: "Enable development build (includes profiler and debug symbols)" },
+        autoRunPlayer: { type: "boolean", description: "Launch the built player after build completes" },
+        connectWithProfiler: { type: "boolean", description: "Allow Unity Profiler to connect to the built player" },
+      },
+      required: ["outputPath"],
+    },
+  },
+
+  // Post-Processing
+  {
+    name: "unity_create_volume",
+    description: "Create a post-processing Volume with a new VolumeProfile. Requires URP and USING_URP scripting define symbol. Global volumes affect the entire scene.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        name: { type: "string", description: "GameObject name (default 'Post-Process Volume')" },
+        isGlobal: { type: "boolean", description: "Global volume affects entire scene (default true)" },
+        parentId: { type: "number", description: "Optional parent GameObject" },
+        priority: { type: "number", description: "Higher priority overrides lower (default 0)" },
+        blendDistance: { type: "number", description: "Blend distance for local volumes (default 0)" },
+        weight: { type: "number", description: "Volume weight 0-1 (default 1)" },
+        profileSavePath: { type: "string", description: "Where to save the VolumeProfile asset (default 'Assets/Settings/<name> Profile.asset')" },
+      },
+    },
+  },
+  {
+    name: "unity_modify_volume",
+    description: "Modify post-processing effects on a Volume. Supports Bloom, Color Adjustments, Vignette, Depth of Field, Tonemapping, Motion Blur, Film Grain. Requires URP + USING_URP define.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        instanceId: { type: "number", description: "Instance ID of the Volume GameObject" },
+        bloomEnabled: { type: "boolean" }, bloomIntensity: { type: "number" }, bloomThreshold: { type: "number" }, bloomScatter: { type: "number", description: "Bloom scatter/spread (0-1)" },
+        colorAdjustmentsEnabled: { type: "boolean" }, postExposure: { type: "number", description: "Post exposure in EV (e.g. 0.5)" }, contrast: { type: "number", description: "Contrast -100 to 100" }, saturation: { type: "number", description: "Saturation -100 to 100" }, hueShift: { type: "number", description: "Hue shift -180 to 180" },
+        vignetteEnabled: { type: "boolean" }, vignetteIntensity: { type: "number", description: "Vignette intensity 0-1" }, vignetteSmoothness: { type: "number", description: "Vignette smoothness 0.01-1" },
+        depthOfFieldEnabled: { type: "boolean" }, focusDistance: { type: "number", description: "Focus distance in meters" }, aperture: { type: "number", description: "f-stop aperture (1.4–32)" }, focalLength: { type: "number", description: "Focal length in mm (1–300)" },
+        tonemappingEnabled: { type: "boolean" }, tonemappingMode: { type: "string", enum: ["None", "Neutral", "ACES"] },
+        motionBlurEnabled: { type: "boolean" }, motionBlurIntensity: { type: "number" },
+        filmGrainEnabled: { type: "boolean" }, filmGrainIntensity: { type: "number" },
+      },
+      required: ["instanceId"],
+    },
+  },
 ];
 
 // Handle tool listing
@@ -1811,7 +2291,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
 
       case "unity_get_console":
-        result = await unityClient.getConsoleLogs();
+        result = await unityClient.getConsoleLogs({
+          type: args?.type as string,
+          search: args?.search as string,
+          count: args?.count as number,
+        });
         break;
 
       case "unity_get_selection":
@@ -2373,6 +2857,314 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "unity_get_physics_settings":
         result = await unityClient.getPhysicsSettings();
+        break;
+
+      // Console
+      case "unity_clear_console":
+        result = await unityClient.clearConsole();
+        break;
+
+      // Audio
+      case "unity_add_audio_source":
+        result = await unityClient.addAudioSource({
+          instanceId: args!.instanceId as number,
+          clipPath: args?.clipPath as string,
+          volume: args?.volume as number,
+          pitch: args?.pitch as number,
+          loop: args?.loop as boolean,
+          playOnAwake: args?.playOnAwake as boolean,
+          mute: args?.mute as boolean,
+          spatialBlend: args?.spatialBlend as number,
+          minDistance: args?.minDistance as number,
+          maxDistance: args?.maxDistance as number,
+          priority: args?.priority as number,
+          stereoPan: args?.stereoPan as number,
+          rolloffMode: args?.rolloffMode as string,
+        });
+        break;
+
+      case "unity_modify_audio_source":
+        result = await unityClient.modifyAudioSource({
+          instanceId: args!.instanceId as number,
+          clipPath: args?.clipPath as string,
+          volume: args?.volume as number,
+          pitch: args?.pitch as number,
+          loop: args?.loop as boolean,
+          playOnAwake: args?.playOnAwake as boolean,
+          mute: args?.mute as boolean,
+          spatialBlend: args?.spatialBlend as number,
+          minDistance: args?.minDistance as number,
+          maxDistance: args?.maxDistance as number,
+          priority: args?.priority as number,
+          stereoPan: args?.stereoPan as number,
+          reverbZoneMix: args?.reverbZoneMix as number,
+          rolloffMode: args?.rolloffMode as string,
+        });
+        break;
+
+      case "unity_get_audio_source":
+        result = await unityClient.getAudioSourceInfo(args!.instanceId as number);
+        break;
+
+      case "unity_play_audio":
+        result = await unityClient.playAudio(
+          args!.instanceId as number,
+          args!.action as "play" | "stop" | "pause" | "unpause"
+        );
+        break;
+
+      // Camera
+      case "unity_get_camera_info":
+        result = await unityClient.getCameraInfo(args!.instanceId as number);
+        break;
+
+      case "unity_modify_camera":
+        result = await unityClient.modifyCamera({
+          instanceId: args!.instanceId as number,
+          fieldOfView: args?.fieldOfView as number,
+          nearClipPlane: args?.nearClipPlane as number,
+          farClipPlane: args?.farClipPlane as number,
+          projectionType: args?.projectionType as string,
+          orthographicSize: args?.orthographicSize as number,
+          depth: args?.depth as number,
+          cullingMask: args?.cullingMask as number,
+          clearFlags: args?.clearFlags as string,
+          backgroundColor: args?.backgroundColor as any,
+          renderTexturePath: args?.renderTexturePath as string,
+          clearRenderTexture: args?.clearRenderTexture as boolean,
+          allowHDR: args?.allowHDR as boolean,
+          allowMSAA: args?.allowMSAA as boolean,
+        });
+        break;
+
+      // TextMeshPro
+      case "unity_create_tmp_text":
+        result = await unityClient.createTMPText({
+          name: args?.name as string,
+          parentId: args?.parentId as number,
+          text: args?.text as string,
+          fontSize: args?.fontSize as number,
+          color: args?.color as any,
+          alignment: args?.alignment as string,
+          anchoredPosition: args?.anchoredPosition as any,
+          sizeDelta: args?.sizeDelta as any,
+          isWorldSpace: args?.isWorldSpace as boolean,
+          position: args?.position as any,
+          rotation: args?.rotation as any,
+        });
+        break;
+
+      case "unity_modify_tmp_text":
+        result = await unityClient.modifyTMPText({
+          instanceId: args!.instanceId as number,
+          text: args?.text as string,
+          fontSize: args?.fontSize as number,
+          color: args?.color as any,
+          alignment: args?.alignment as string,
+          bold: args?.bold as boolean,
+          italic: args?.italic as boolean,
+          characterSpacing: args?.characterSpacing as number,
+          lineSpacing: args?.lineSpacing as number,
+          autoSizeFont: args?.autoSizeFont as boolean,
+          wordWrapping: args?.wordWrapping as boolean,
+        });
+        break;
+
+      // Layers & Tags
+      case "unity_get_layers_and_tags":
+        result = await unityClient.getLayersAndTags();
+        break;
+
+      case "unity_add_layer":
+        result = await unityClient.addLayer(args!.layerName as string);
+        break;
+
+      case "unity_add_tag":
+        result = await unityClient.addTag(args!.tagName as string);
+        break;
+
+      // NavMesh
+      case "unity_bake_navmesh":
+        result = await unityClient.bakeNavMesh();
+        break;
+
+      case "unity_clear_navmesh":
+        result = await unityClient.clearNavMesh();
+        break;
+
+      case "unity_add_navmesh_agent":
+        result = await unityClient.addNavMeshAgent({
+          instanceId: args!.instanceId as number,
+          speed: args?.speed as number,
+          angularSpeed: args?.angularSpeed as number,
+          acceleration: args?.acceleration as number,
+          stoppingDistance: args?.stoppingDistance as number,
+          radius: args?.radius as number,
+          height: args?.height as number,
+          autoBraking: args?.autoBraking as boolean,
+          autoRepath: args?.autoRepath as boolean,
+          obstacleAvoidanceType: args?.obstacleAvoidanceType as number,
+        });
+        break;
+
+      case "unity_add_navmesh_obstacle":
+        result = await unityClient.addNavMeshObstacle({
+          instanceId: args!.instanceId as number,
+          shape: args?.shape as string,
+          radius: args?.radius as number,
+          height: args?.height as number,
+          center: args?.center as any,
+          size: args?.size as any,
+          carve: args?.carve as boolean,
+          carveOnlyStationary: args?.carveOnlyStationary as boolean,
+        });
+        break;
+
+      // 2D Physics
+      case "unity_add_rigidbody2d":
+        result = await unityClient.addRigidbody2D({
+          instanceId: args!.instanceId as number,
+          mass: args?.mass as number,
+          linearDrag: args?.linearDrag as number,
+          angularDrag: args?.angularDrag as number,
+          gravityScale: args?.gravityScale as number,
+          isKinematic: args?.isKinematic as boolean,
+          bodyType: args?.bodyType as string,
+          collisionDetection: args?.collisionDetection as string,
+          interpolation: args?.interpolation as string,
+          constraints: args?.constraints as string,
+        });
+        break;
+
+      case "unity_add_collider2d":
+        result = await unityClient.addCollider2D({
+          instanceId: args!.instanceId as number,
+          colliderType: args!.colliderType as string,
+          isTrigger: args?.isTrigger as boolean,
+          offset: args?.offset as any,
+          size: args?.size as any,
+          radius: args?.radius as number,
+          height: args?.height as number,
+          capsuleDirection: args?.capsuleDirection as string,
+          physicsMaterialPath: args?.physicsMaterialPath as string,
+        });
+        break;
+
+      // Tilemap
+      case "unity_create_tilemap":
+        result = await unityClient.createTilemap({
+          name: args?.name as string,
+          parentId: args?.parentId as number,
+          position: args?.position as any,
+          cellSize: args?.cellSize as number,
+          orientation: args?.orientation as string,
+        });
+        break;
+
+      case "unity_set_tile":
+        result = await unityClient.setTile({
+          instanceId: args!.instanceId as number,
+          x: args!.x as number,
+          y: args!.y as number,
+          z: args?.z as number,
+          tilePath: args?.tilePath as string,
+        });
+        break;
+
+      case "unity_fill_tiles":
+        result = await unityClient.fillTiles({
+          instanceId: args!.instanceId as number,
+          xMin: args!.xMin as number,
+          yMin: args!.yMin as number,
+          xMax: args!.xMax as number,
+          yMax: args!.yMax as number,
+          tilePath: args?.tilePath as string,
+        });
+        break;
+
+      // Animation Clips
+      case "unity_create_animation_clip":
+        result = await unityClient.createAnimationClip({
+          name: args?.name as string,
+          savePath: args?.savePath as string,
+          frameRate: args?.frameRate as number,
+          isLooping: args?.isLooping as boolean,
+        });
+        break;
+
+      case "unity_add_keyframes":
+        result = await unityClient.addKeyframes({
+          clipPath: args!.clipPath as string,
+          gameObjectPath: args?.gameObjectPath as string,
+          bindingType: args?.bindingType as string,
+          propertyPath: args!.propertyPath as string,
+          keyframes: args!.keyframes as Array<{ time: number; value: number }>,
+          smoothTangents: args?.smoothTangents as boolean,
+        });
+        break;
+
+      case "unity_get_animation_clip_info":
+        result = await unityClient.getAnimationClipInfo({
+          clipPath: args?.clipPath as string,
+          instanceId: args?.instanceId as number,
+        });
+        break;
+
+      // Build
+      case "unity_get_build_settings":
+        result = await unityClient.getBuildSettings();
+        break;
+
+      case "unity_set_build_scenes":
+        result = await unityClient.setBuildScenes({
+          scenePaths: args!.scenePaths as string[],
+          addToExisting: args?.addToExisting as boolean,
+        });
+        break;
+
+      case "unity_switch_build_target":
+        result = await unityClient.switchBuildTarget(args!.buildTarget as string);
+        break;
+
+      case "unity_build_player":
+        result = await unityClient.buildPlayer({
+          outputPath: args!.outputPath as string,
+          buildTarget: args?.buildTarget as string,
+          development: args?.development as boolean,
+          autoRunPlayer: args?.autoRunPlayer as boolean,
+          connectWithProfiler: args?.connectWithProfiler as boolean,
+        });
+        break;
+
+      // Post-Processing
+      case "unity_create_volume":
+        result = await unityClient.createVolume({
+          name: args?.name as string,
+          isGlobal: args?.isGlobal as boolean,
+          parentId: args?.parentId as number,
+          priority: args?.priority as number,
+          blendDistance: args?.blendDistance as number,
+          weight: args?.weight as number,
+          profileSavePath: args?.profileSavePath as string,
+        });
+        break;
+
+      case "unity_modify_volume":
+        result = await unityClient.modifyVolume({
+          instanceId: args!.instanceId as number,
+          bloomEnabled: args?.bloomEnabled as boolean, bloomIntensity: args?.bloomIntensity as number,
+          bloomThreshold: args?.bloomThreshold as number, bloomScatter: args?.bloomScatter as number,
+          colorAdjustmentsEnabled: args?.colorAdjustmentsEnabled as boolean,
+          postExposure: args?.postExposure as number, contrast: args?.contrast as number,
+          saturation: args?.saturation as number, hueShift: args?.hueShift as number,
+          vignetteEnabled: args?.vignetteEnabled as boolean, vignetteIntensity: args?.vignetteIntensity as number,
+          vignetteSmoothness: args?.vignetteSmoothness as number,
+          depthOfFieldEnabled: args?.depthOfFieldEnabled as boolean, focusDistance: args?.focusDistance as number,
+          aperture: args?.aperture as number, focalLength: args?.focalLength as number,
+          tonemappingEnabled: args?.tonemappingEnabled as boolean, tonemappingMode: args?.tonemappingMode as string,
+          motionBlurEnabled: args?.motionBlurEnabled as boolean, motionBlurIntensity: args?.motionBlurIntensity as number,
+          filmGrainEnabled: args?.filmGrainEnabled as boolean, filmGrainIntensity: args?.filmGrainIntensity as number,
+        });
         break;
 
       default:

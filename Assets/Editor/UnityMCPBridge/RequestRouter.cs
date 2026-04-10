@@ -29,10 +29,14 @@ namespace UnityMCPBridge
                         "/components" => SceneDataProvider.GetComponents(request.QueryString["id"]),
                         "/assets" => AssetDataProvider.GetProjectAssets(request.QueryString["filter"]),
                         "/scripts" => AssetDataProvider.GetScripts(request.QueryString["filter"]),
-                        "/console" => ConsoleDataProvider.GetConsoleLogs(),
+                        "/console" => ConsoleDataProvider.GetConsoleLogs(
+                            typeFilter: request.QueryString["type"],
+                            search: request.QueryString["search"],
+                            maxCount: int.TryParse(request.QueryString["count"], out int n) ? n : 100),
                         "/selection" => SelectionDataProvider.GetCurrentSelection(),
                         "/material" => MaterialHandler.GetMaterialInfo(request.QueryString["path"]),
                         "/profiler" => ProfilerDataProvider.GetProfilerData(),
+                        "/editor/layers-and-tags" => LayerTagHandler.GetLayersAndTags(""),
                         _ => JsonConvert.SerializeObject(new { error = "Unknown endpoint", path })
                     };
                 }
@@ -108,6 +112,47 @@ namespace UnityMCPBridge
                         "/physics/collider" => PhysicsHandler.AddCollider(body),
                         "/physics/settings/set" => PhysicsHandler.SetPhysicsSettings(body),
                         "/physics/settings/get" => PhysicsHandler.GetPhysicsSettings(body),
+                        // Audio
+                        "/audio/source/add" => AudioHandler.AddAudioSource(body),
+                        "/audio/source/modify" => AudioHandler.ModifyAudioSource(body),
+                        "/audio/source/info" => AudioHandler.GetAudioSourceInfo(body),
+                        "/audio/source/play" => AudioHandler.PlayAudio(body),
+                        // Camera
+                        "/camera/info" => CameraHandler.GetCameraInfo(body),
+                        "/camera/modify" => CameraHandler.ModifyCamera(body),
+                        // TextMeshPro
+                        "/tmp/create" => TextMeshProHandler.CreateTMPText(body),
+                        "/tmp/modify" => TextMeshProHandler.ModifyTMPText(body),
+                        // Layer/Tag
+                        "/editor/layer/add" => LayerTagHandler.AddLayer(body),
+                        "/editor/tag/add" => LayerTagHandler.AddTag(body),
+                        "/editor/layers-and-tags" => LayerTagHandler.GetLayersAndTags(body),
+                        // Console
+                        "/console/clear" => ConsoleDataProvider.ClearLogs(),
+                        // NavMesh
+                        "/navmesh/bake" => NavMeshHandler.BakeNavMesh(body),
+                        "/navmesh/clear" => NavMeshHandler.ClearNavMesh(body),
+                        "/navmesh/agent/add" => NavMeshHandler.AddNavMeshAgent(body),
+                        "/navmesh/obstacle/add" => NavMeshHandler.AddNavMeshObstacle(body),
+                        // 2D Physics
+                        "/physics2d/rigidbody" => Physics2DHandler.AddRigidbody2D(body),
+                        "/physics2d/collider" => Physics2DHandler.AddCollider2D(body),
+                        // Tilemap
+                        "/tilemap/create" => TilemapHandler.CreateTilemap(body),
+                        "/tilemap/tile/set" => TilemapHandler.SetTile(body),
+                        "/tilemap/tile/fill" => TilemapHandler.FillTiles(body),
+                        // Animation Clips
+                        "/animation/clip/create" => AnimationClipHandler.CreateAnimationClip(body),
+                        "/animation/clip/keyframes" => AnimationClipHandler.AddKeyframes(body),
+                        "/animation/clip/info" => AnimationClipHandler.GetClipInfo(body),
+                        // Build
+                        "/build/settings" => BuildHandler.GetBuildSettings(body),
+                        "/build/scenes" => BuildHandler.SetBuildScenes(body),
+                        "/build/target" => BuildHandler.SwitchBuildTarget(body),
+                        "/build/player" => BuildHandler.BuildPlayer(body),
+                        // Post-processing
+                        "/postprocessing/create" => PostProcessingHandler.CreateVolume(body),
+                        "/postprocessing/modify" => PostProcessingHandler.ModifyVolume(body),
                         _ => JsonConvert.SerializeObject(new { error = "Unknown endpoint", path })
                     };
                 }

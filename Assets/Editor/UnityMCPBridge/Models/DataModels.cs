@@ -846,6 +846,437 @@ namespace UnityMCPBridge.Models
         public int? InstanceId { get; set; }
     }
 
+    // ========== Shared Request Models ==========
+
+    /// <summary>Generic request with just an instance ID (reused across handlers)</summary>
+    public class InstanceIdRequest
+    {
+        public int InstanceId { get; set; }
+    }
+
+    // ========== Audio Models ==========
+
+    public class AddAudioSourceRequest
+    {
+        public int InstanceId { get; set; }
+        public string ClipPath { get; set; }
+        public float Volume { get; set; } = 1f;
+        public float Pitch { get; set; } = 1f;
+        public bool Loop { get; set; }
+        public bool PlayOnAwake { get; set; } = true;
+        public bool Mute { get; set; }
+        public float SpatialBlend { get; set; } = 0f; // 0=2D, 1=3D
+        public float MinDistance { get; set; } = 1f;
+        public float MaxDistance { get; set; } = 500f;
+        public int Priority { get; set; } = 128;
+        public float StereoPan { get; set; } = 0f;
+        public string RolloffMode { get; set; } = "Logarithmic";
+    }
+
+    public class ModifyAudioSourceRequest
+    {
+        public int InstanceId { get; set; }
+        public string ClipPath { get; set; }
+        public float? Volume { get; set; }
+        public float? Pitch { get; set; }
+        public bool? Loop { get; set; }
+        public bool? PlayOnAwake { get; set; }
+        public bool? Mute { get; set; }
+        public float? SpatialBlend { get; set; }
+        public float? MinDistance { get; set; }
+        public float? MaxDistance { get; set; }
+        public int? Priority { get; set; }
+        public float? StereoPan { get; set; }
+        public float? ReverbZoneMix { get; set; }
+        public string RolloffMode { get; set; }
+    }
+
+    public class PlayAudioRequest
+    {
+        public int InstanceId { get; set; }
+        public string Action { get; set; } // play, stop, pause, unpause
+    }
+
+    public class AudioSourceInfoResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string ClipName { get; set; }
+        public string ClipPath { get; set; }
+        public float Volume { get; set; }
+        public float Pitch { get; set; }
+        public bool Loop { get; set; }
+        public bool PlayOnAwake { get; set; }
+        public bool Mute { get; set; }
+        public float SpatialBlend { get; set; }
+        public float MinDistance { get; set; }
+        public float MaxDistance { get; set; }
+        public int Priority { get; set; }
+        public float StereoPan { get; set; }
+        public float ReverbZoneMix { get; set; }
+        public string RolloffMode { get; set; }
+        public bool IsPlaying { get; set; }
+    }
+
+    // ========== Camera Models ==========
+
+    public class ModifyCameraRequest
+    {
+        public int InstanceId { get; set; }
+        public float? FieldOfView { get; set; }
+        public float? NearClipPlane { get; set; }
+        public float? FarClipPlane { get; set; }
+        public string ProjectionType { get; set; } // Perspective, Orthographic
+        public float? OrthographicSize { get; set; }
+        public float? Depth { get; set; }
+        public int? CullingMask { get; set; }
+        public string ClearFlags { get; set; } // Skybox, SolidColor, Depth, Nothing
+        public ColorData BackgroundColor { get; set; }
+        public string RenderTexturePath { get; set; }
+        public bool? ClearRenderTexture { get; set; }
+        public bool? AllowHDR { get; set; }
+        public bool? AllowMSAA { get; set; }
+    }
+
+    public class CameraInfoResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public float FieldOfView { get; set; }
+        public float NearClipPlane { get; set; }
+        public float FarClipPlane { get; set; }
+        public bool IsOrthographic { get; set; }
+        public float OrthographicSize { get; set; }
+        public float Depth { get; set; }
+        public int CullingMask { get; set; }
+        public string ClearFlags { get; set; }
+        public ColorData BackgroundColor { get; set; }
+        public bool IsMainCamera { get; set; }
+        public string RenderTexture { get; set; }
+        public bool AllowHDR { get; set; }
+        public bool AllowMSAA { get; set; }
+        public string RenderingPath { get; set; }
+    }
+
+    // ========== TextMeshPro Models ==========
+
+    public class CreateTMPTextRequest
+    {
+        public string Name { get; set; }
+        public int? ParentId { get; set; }
+        public string Text { get; set; }
+        public float? FontSize { get; set; }
+        public ColorData Color { get; set; }
+        public string Alignment { get; set; }
+        public Vector2Data AnchoredPosition { get; set; }
+        public Vector2Data SizeDelta { get; set; }
+        public bool IsWorldSpace { get; set; }
+        public Vector3Data Position { get; set; }
+        public Vector3Data Rotation { get; set; }
+    }
+
+    public class ModifyTMPTextRequest
+    {
+        public int InstanceId { get; set; }
+        public string Text { get; set; }
+        public float? FontSize { get; set; }
+        public ColorData Color { get; set; }
+        public string Alignment { get; set; }
+        public bool? Bold { get; set; }
+        public bool? Italic { get; set; }
+        public float? CharacterSpacing { get; set; }
+        public float? LineSpacing { get; set; }
+        public bool? AutoSizeFont { get; set; }
+        public bool? WordWrapping { get; set; }
+    }
+
+    // ========== Layer/Tag Models ==========
+
+    public class AddLayerRequest
+    {
+        public string LayerName { get; set; }
+    }
+
+    public class AddTagRequest
+    {
+        public string TagName { get; set; }
+    }
+
+    public class LayerInfo
+    {
+        public int Index { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class LayerAddResult : OperationResult
+    {
+        public int LayerIndex { get; set; }
+    }
+
+    public class LayersAndTagsResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public List<LayerInfo> Layers { get; set; }
+        public List<string> Tags { get; set; }
+    }
+
+    // ========== NavMesh Models ==========
+
+    public class AddNavMeshAgentRequest
+    {
+        public int InstanceId { get; set; }
+        public float? Speed { get; set; }
+        public float? AngularSpeed { get; set; }
+        public float? Acceleration { get; set; }
+        public float? StoppingDistance { get; set; }
+        public float? Radius { get; set; }
+        public float? Height { get; set; }
+        public bool? AutoBraking { get; set; }
+        public bool? AutoRepath { get; set; }
+        public int? ObstacleAvoidanceType { get; set; } // 0=None, 1=Low, 2=Med, 3=Good, 4=High
+    }
+
+    public class AddNavMeshObstacleRequest
+    {
+        public int InstanceId { get; set; }
+        public string Shape { get; set; } // Capsule, Box
+        public float? Radius { get; set; }
+        public float? Height { get; set; }
+        public Vector3Data Center { get; set; }
+        public Vector3Data Size { get; set; }
+        public bool? Carve { get; set; }
+        public bool? CarveOnlyStationary { get; set; }
+    }
+
+    // ========== 2D Physics Models ==========
+
+    public class AddRigidbody2DRequest
+    {
+        public int InstanceId { get; set; }
+        public float Mass { get; set; } = 1f;
+        public float LinearDrag { get; set; } = 0f;
+        public float AngularDrag { get; set; } = 0.05f;
+        public float GravityScale { get; set; } = 1f;
+        public bool IsKinematic { get; set; }
+        public string BodyType { get; set; } // Dynamic, Kinematic, Static
+        public string CollisionDetection { get; set; } = "Discrete";
+        public string Interpolation { get; set; } = "None";
+        public string Constraints { get; set; }
+    }
+
+    public class AddCollider2DRequest
+    {
+        public int InstanceId { get; set; }
+        public string ColliderType { get; set; } // Box, Circle, Polygon, Capsule, Edge
+        public bool IsTrigger { get; set; }
+        public Vector2Data Offset { get; set; }
+        public Vector2Data Size { get; set; }
+        public float? Radius { get; set; }
+        public float? Height { get; set; }
+        public string CapsuleDirection { get; set; } // Vertical, Horizontal
+        public string PhysicsMaterialPath { get; set; }
+    }
+
+    // ========== Tilemap Models ==========
+
+    public class CreateTilemapRequest
+    {
+        public string Name { get; set; }
+        public int? ParentId { get; set; }
+        public Vector3Data Position { get; set; }
+        public float? CellSize { get; set; }
+        public string Orientation { get; set; } = "XY"; // XY, XZ, HexFlat, HexPoint
+    }
+
+    public class TilemapCreateResult : OperationResult
+    {
+        public int GridInstanceId { get; set; }
+    }
+
+    public class SetTileRequest
+    {
+        public int InstanceId { get; set; } // Tilemap GameObject
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Z { get; set; }
+        public string TilePath { get; set; } // null = clear tile
+    }
+
+    public class FillTilesRequest
+    {
+        public int InstanceId { get; set; }
+        public int XMin { get; set; }
+        public int YMin { get; set; }
+        public int XMax { get; set; }
+        public int YMax { get; set; }
+        public string TilePath { get; set; }
+    }
+
+    // ========== Animation Clip Models ==========
+
+    public class CreateAnimationClipRequest
+    {
+        public string Name { get; set; }
+        public string SavePath { get; set; }
+        public float? FrameRate { get; set; }
+        public bool? IsLooping { get; set; }
+    }
+
+    public class AnimationClipResult : OperationResult
+    {
+        public string ClipPath { get; set; }
+    }
+
+    public class KeyframeData
+    {
+        public float Time { get; set; }
+        public float Value { get; set; }
+    }
+
+    public class AddKeyframesRequest
+    {
+        public string ClipPath { get; set; }
+        public string GameObjectPath { get; set; } // Path within animated hierarchy (empty = root)
+        public string BindingType { get; set; } // Transform, Light, Camera, etc.
+        public string PropertyPath { get; set; } // e.g. "localPosition.x", "m_LocalScale.y"
+        public List<KeyframeData> Keyframes { get; set; }
+        public bool SmoothTangents { get; set; }
+    }
+
+    public class GetClipInfoRequest
+    {
+        public string ClipPath { get; set; }
+        public int? InstanceId { get; set; }
+    }
+
+    public class AnimationClipInfoResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string Name { get; set; }
+        public float Length { get; set; }
+        public float FrameRate { get; set; }
+        public bool IsLooping { get; set; }
+        public string WrapMode { get; set; }
+        public int CurveCount { get; set; }
+        public List<string> CurveBindings { get; set; }
+    }
+
+    // ========== Build Models ==========
+
+    public class BuildSceneInfo
+    {
+        public string Path { get; set; }
+        public bool Enabled { get; set; }
+        public int BuildIndex { get; set; }
+    }
+
+    public class BuildSettingsResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string ActiveBuildTarget { get; set; }
+        public string ActiveBuildTargetGroup { get; set; }
+        public List<BuildSceneInfo> Scenes { get; set; }
+        public bool DevelopmentBuild { get; set; }
+        public bool ConnectWithProfiler { get; set; }
+        public bool AllowDebugging { get; set; }
+    }
+
+    public class SetBuildScenesRequest
+    {
+        public List<string> ScenePaths { get; set; }
+        public bool? AddToExisting { get; set; }
+    }
+
+    public class SwitchBuildTargetRequest
+    {
+        public string BuildTarget { get; set; }
+    }
+
+    public class BuildPlayerRequest
+    {
+        public string OutputPath { get; set; }
+        public string BuildTarget { get; set; }
+        public bool Development { get; set; }
+        public bool AutoRunPlayer { get; set; }
+        public bool ConnectWithProfiler { get; set; }
+    }
+
+    public class BuildPlayerResult : OperationResult
+    {
+        public string OutputPath { get; set; }
+        public float BuildTime { get; set; }
+        public ulong TotalSize { get; set; }
+        public int ErrorCount { get; set; }
+        public int WarningCount { get; set; }
+    }
+
+    // ========== Post-Processing (URP) Models ==========
+
+    public class CreateVolumeRequest
+    {
+        public string Name { get; set; }
+        public bool IsGlobal { get; set; } = true;
+        public int? ParentId { get; set; }
+        public float Priority { get; set; } = 0f;
+        public float BlendDistance { get; set; } = 0f;
+        public float Weight { get; set; } = 1f;
+        public string ProfileName { get; set; }
+        public string ProfileSavePath { get; set; }
+    }
+
+    public class VolumeCreateResult : OperationResult
+    {
+        public string ProfilePath { get; set; }
+    }
+
+    public class ModifyVolumeRequest
+    {
+        public int InstanceId { get; set; }
+        // Bloom
+        public bool? BloomEnabled { get; set; }
+        public float? BloomIntensity { get; set; }
+        public float? BloomThreshold { get; set; }
+        public float? BloomScatter { get; set; }
+        // Color Adjustments
+        public bool? ColorAdjustmentsEnabled { get; set; }
+        public float? PostExposure { get; set; }
+        public float? Contrast { get; set; }
+        public float? Saturation { get; set; }
+        public float? HueShift { get; set; }
+        // Vignette
+        public bool? VignetteEnabled { get; set; }
+        public float? VignetteIntensity { get; set; }
+        public float? VignetteSmoothness { get; set; }
+        // Depth of Field
+        public bool? DepthOfFieldEnabled { get; set; }
+        public float? FocusDistance { get; set; }
+        public float? Aperture { get; set; }
+        public float? FocalLength { get; set; }
+        // Tonemapping
+        public bool? TonemappingEnabled { get; set; }
+        public string TonemappingMode { get; set; } // None, Neutral, ACES
+        // Motion Blur
+        public bool? MotionBlurEnabled { get; set; }
+        public float? MotionBlurIntensity { get; set; }
+        // Film Grain
+        public bool? FilmGrainEnabled { get; set; }
+        public float? FilmGrainIntensity { get; set; }
+    }
+
+    // ========== Console Filter Models ==========
+
+    public class FilteredConsoleData
+    {
+        public int TotalCount { get; set; }
+        public int FilteredCount { get; set; }
+        public string TypeFilter { get; set; }
+        public string SearchFilter { get; set; }
+        public List<LogEntry> Logs { get; set; }
+    }
+
     // ========== Particle System Models ==========
 
     public class MinMaxCurveData
