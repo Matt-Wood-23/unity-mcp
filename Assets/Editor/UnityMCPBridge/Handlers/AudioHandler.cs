@@ -58,6 +58,15 @@ namespace UnityMCPBridge.Handlers
                 if (source == null)
                     return Error($"No AudioSource on '{go.name}'");
 
+                // Validate clip path before applying any mutations
+                AudioClip newClip = null;
+                if (!string.IsNullOrEmpty(request.ClipPath))
+                {
+                    newClip = AssetDatabase.LoadAssetAtPath<AudioClip>(request.ClipPath);
+                    if (newClip == null)
+                        return Error($"AudioClip not found at: {request.ClipPath}");
+                }
+
                 Undo.RecordObject(source, $"Modify AudioSource {go.name}");
 
                 if (request.Volume.HasValue) source.volume = request.Volume.Value;
@@ -81,14 +90,8 @@ namespace UnityMCPBridge.Handlers
                     };
                 }
 
-                if (!string.IsNullOrEmpty(request.ClipPath))
-                {
-                    var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(request.ClipPath);
-                    if (clip != null)
-                        source.clip = clip;
-                    else
-                        return Error($"AudioClip not found at: {request.ClipPath}");
-                }
+                if (newClip != null)
+                    source.clip = newClip;
 
                 EditorUtility.SetDirty(source);
                 return JsonConvert.SerializeObject(new OperationResult
@@ -198,6 +201,7 @@ namespace UnityMCPBridge.Handlers
             source.maxDistance = request.MaxDistance;
             source.priority = request.Priority;
             source.panStereo = request.StereoPan;
+            if (request.ReverbZoneMix.HasValue) source.reverbZoneMix = request.ReverbZoneMix.Value;
 
             if (!string.IsNullOrEmpty(request.ClipPath))
             {

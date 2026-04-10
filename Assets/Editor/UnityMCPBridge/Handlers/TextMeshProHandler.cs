@@ -56,9 +56,9 @@ namespace UnityMCPBridge.Handlers
                 }
                 else
                 {
-                    // UI text - needs RectTransform
-                    var rect = go.AddComponent<RectTransform>();
+                    // UI text - TextMeshProUGUI auto-adds RectTransform
                     var tmp = go.AddComponent<TextMeshProUGUI>();
+                    var rect = go.GetComponent<RectTransform>();
                     tmp.text = request.Text ?? "Sample Text";
                     if (request.FontSize.HasValue) tmp.fontSize = request.FontSize.Value;
                     if (request.Color != null)
@@ -131,9 +131,16 @@ namespace UnityMCPBridge.Handlers
                 if (request.CharacterSpacing.HasValue) tmp.characterSpacing = request.CharacterSpacing.Value;
                 if (request.LineSpacing.HasValue) tmp.lineSpacing = request.LineSpacing.Value;
                 if (request.AutoSizeFont.HasValue) tmp.enableAutoSizing = request.AutoSizeFont.Value;
-                if (request.WordWrapping.HasValue) tmp.textWrappingMode = request.WordWrapping.Value
-                    ? TextWrappingModes.Normal
-                    : TextWrappingModes.NoWrap;
+                if (request.WordWrapping.HasValue)
+                {
+#if UNITY_2023_1_OR_NEWER
+                    tmp.textWrappingMode = request.WordWrapping.Value
+                        ? TextWrappingModes.Normal
+                        : TextWrappingModes.NoWrap;
+#else
+                    tmp.enableWordWrapping = request.WordWrapping.Value;
+#endif
+                }
 
                 EditorUtility.SetDirty(tmp);
 

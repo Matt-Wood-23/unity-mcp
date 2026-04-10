@@ -118,7 +118,7 @@ namespace UnityMCPBridge.Handlers
                 if (request.Center != null) obstacle.center = request.Center.ToVector3();
                 if (request.Size != null) obstacle.size = request.Size.ToVector3();
                 if (request.Carve.HasValue) obstacle.carving = request.Carve.Value;
-                if (request.CarveOnlyStationary.HasValue) obstacle.carvingMoveThreshold = request.CarveOnlyStationary.Value ? 0.1f : float.MaxValue;
+                if (request.CarveOnlyStationary.HasValue) obstacle.carveOnlyStationary = request.CarveOnlyStationary.Value;
 
                 EditorUtility.SetDirty(go);
 

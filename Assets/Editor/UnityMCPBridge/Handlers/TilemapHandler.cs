@@ -38,13 +38,22 @@ namespace UnityMCPBridge.Handlers
 
                     if (!string.IsNullOrEmpty(request.Orientation))
                     {
-                        grid.cellLayout = request.Orientation.ToUpper() switch
+                        switch (request.Orientation.ToUpper())
                         {
-                            "XZ" => GridLayout.CellLayout.IsometricZAsY,
-                            "HEXFLAT" => GridLayout.CellLayout.HexagonalFlatTop,
-                            "HEXPOINT" => GridLayout.CellLayout.Hexagonal,
-                            _ => GridLayout.CellLayout.Rectangle
-                        };
+                            case "XZ":
+                                grid.cellLayout = GridLayout.CellLayout.Rectangle;
+                                grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
+                                break;
+                            case "HEXFLAT":
+                                grid.cellLayout = GridLayout.CellLayout.HexagonalFlatTop;
+                                break;
+                            case "HEXPOINT":
+                                grid.cellLayout = GridLayout.CellLayout.Hexagonal;
+                                break;
+                            default:
+                                grid.cellLayout = GridLayout.CellLayout.Rectangle;
+                                break;
+                        }
                     }
 
                     if (request.Position != null)

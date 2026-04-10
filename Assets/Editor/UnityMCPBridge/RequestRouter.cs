@@ -126,7 +126,6 @@ namespace UnityMCPBridge
                         // Layer/Tag
                         "/editor/layer/add" => LayerTagHandler.AddLayer(body),
                         "/editor/tag/add" => LayerTagHandler.AddTag(body),
-                        "/editor/layers-and-tags" => LayerTagHandler.GetLayersAndTags(body),
                         // Console
                         "/console/clear" => ConsoleDataProvider.ClearLogs(),
                         // NavMesh

@@ -1234,11 +1234,11 @@ export class UnityClient {
   }): Promise<any> {
     return this.post("/physics2d/rigidbody", {
       InstanceId: options.instanceId,
-      Mass: options.mass ?? 1,
-      LinearDrag: options.linearDrag ?? 0,
-      AngularDrag: options.angularDrag ?? 0.05,
-      GravityScale: options.gravityScale ?? 1,
-      IsKinematic: options.isKinematic ?? false,
+      Mass: options.mass,
+      LinearDrag: options.linearDrag,
+      AngularDrag: options.angularDrag,
+      GravityScale: options.gravityScale,
+      IsKinematic: options.isKinematic,
       BodyType: options.bodyType,
       CollisionDetection: options.collisionDetection,
       Interpolation: options.interpolation,

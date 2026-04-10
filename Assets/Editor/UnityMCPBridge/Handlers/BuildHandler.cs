@@ -149,7 +149,9 @@ namespace UnityMCPBridge.Handlers
                     scenes = GetEnabledScenePaths(),
                     locationPathName = request.OutputPath,
                     target = target,
+#pragma warning disable CS0618 // targetGroup is deprecated in Unity 2023.1+ but needed for older versions
                     targetGroup = group,
+#pragma warning restore CS0618
                     options = options
                 };
 

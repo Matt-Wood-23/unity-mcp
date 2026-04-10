@@ -110,7 +110,9 @@ namespace UnityMCPBridge.Handlers
                         request.BackgroundColor.A);
                 }
 
-                if (!string.IsNullOrEmpty(request.RenderTexturePath))
+                if (request.ClearRenderTexture == true)
+                    cam.targetTexture = null;
+                else if (!string.IsNullOrEmpty(request.RenderTexturePath))
                 {
                     var rt = AssetDatabase.LoadAssetAtPath<RenderTexture>(request.RenderTexturePath);
                     if (rt != null)
@@ -118,9 +120,6 @@ namespace UnityMCPBridge.Handlers
                     else
                         return Error($"RenderTexture not found at: {request.RenderTexturePath}");
                 }
-
-                if (request.ClearRenderTexture == true)
-                    cam.targetTexture = null;
 
                 EditorUtility.SetDirty(cam);
 

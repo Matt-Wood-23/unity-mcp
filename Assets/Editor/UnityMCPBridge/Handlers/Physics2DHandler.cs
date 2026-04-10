@@ -21,16 +21,17 @@ namespace UnityMCPBridge.Handlers
                     return Error($"GameObject not found: {request.InstanceId}");
 
                 Rigidbody2D rb = go.GetComponent<Rigidbody2D>();
-                if (rb == null)
+                bool isNew = rb == null;
+                if (isNew)
                     rb = Undo.AddComponent<Rigidbody2D>(go);
                 else
                     Undo.RecordObject(rb, $"Configure Rigidbody2D {go.name}");
 
-                rb.mass = request.Mass;
-                rb.linearDamping = request.LinearDrag;
-                rb.angularDamping = request.AngularDrag;
-                rb.gravityScale = request.GravityScale;
-                rb.isKinematic = request.IsKinematic;
+                if (request.Mass.HasValue) rb.mass = request.Mass.Value;
+                if (request.LinearDrag.HasValue) rb.linearDamping = request.LinearDrag.Value;
+                if (request.AngularDrag.HasValue) rb.angularDamping = request.AngularDrag.Value;
+                if (request.GravityScale.HasValue) rb.gravityScale = request.GravityScale.Value;
+                if (request.IsKinematic.HasValue) rb.isKinematic = request.IsKinematic.Value;
 
                 if (!string.IsNullOrEmpty(request.BodyType))
                 {

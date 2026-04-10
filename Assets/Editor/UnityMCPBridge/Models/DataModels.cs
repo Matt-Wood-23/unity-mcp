@@ -870,6 +870,7 @@ namespace UnityMCPBridge.Models
         public float MaxDistance { get; set; } = 500f;
         public int Priority { get; set; } = 128;
         public float StereoPan { get; set; } = 0f;
+        public float? ReverbZoneMix { get; set; }
         public string RolloffMode { get; set; } = "Logarithmic";
     }
 
@@ -1054,14 +1055,14 @@ namespace UnityMCPBridge.Models
     public class AddRigidbody2DRequest
     {
         public int InstanceId { get; set; }
-        public float Mass { get; set; } = 1f;
-        public float LinearDrag { get; set; } = 0f;
-        public float AngularDrag { get; set; } = 0.05f;
-        public float GravityScale { get; set; } = 1f;
-        public bool IsKinematic { get; set; }
+        public float? Mass { get; set; }
+        public float? LinearDrag { get; set; }
+        public float? AngularDrag { get; set; }
+        public float? GravityScale { get; set; }
+        public bool? IsKinematic { get; set; }
         public string BodyType { get; set; } // Dynamic, Kinematic, Static
-        public string CollisionDetection { get; set; } = "Discrete";
-        public string Interpolation { get; set; } = "None";
+        public string CollisionDetection { get; set; }
+        public string Interpolation { get; set; }
         public string Constraints { get; set; }
     }
 
