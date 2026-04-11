@@ -810,6 +810,39 @@ namespace UnityMCPBridge.Models
         public string Message { get; set; }
     }
 
+    // ========== Layer Collision Matrix Models ==========
+
+    public class SetCollisionMatrixRequest
+    {
+        public List<CollisionMatrixEntry> Entries { get; set; } // Set specific pairs
+        public bool? EnableAll { get; set; } // Set all pairs to collide
+        public bool? DisableAll { get; set; } // Set all pairs to not collide
+    }
+
+    public class CollisionMatrixEntry
+    {
+        public int Layer1 { get; set; }
+        public int Layer2 { get; set; }
+        public bool Collide { get; set; }
+    }
+
+    public class CollisionMatrixResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public List<CollisionMatrixLayerPair> Pairs { get; set; }
+        public List<LayerInfo> Layers { get; set; }
+    }
+
+    public class CollisionMatrixLayerPair
+    {
+        public int Layer1 { get; set; }
+        public string Layer1Name { get; set; }
+        public int Layer2 { get; set; }
+        public string Layer2Name { get; set; }
+        public bool Collide { get; set; }
+    }
+
     // ========== Prefab Models ==========
 
     public class CreatePrefabRequest

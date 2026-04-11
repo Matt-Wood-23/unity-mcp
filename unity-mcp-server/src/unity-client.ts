@@ -824,6 +824,26 @@ export class UnityClient {
     return this.post("/physics/settings/get", {});
   }
 
+  async getCollisionMatrix(): Promise<any> {
+    return this.post("/physics/collision/matrix/get", {});
+  }
+
+  async setCollisionMatrix(options: {
+    entries?: { layer1: number; layer2: number; collide: boolean }[];
+    enableAll?: boolean;
+    disableAll?: boolean;
+  }): Promise<any> {
+    return this.post("/physics/collision/matrix/set", {
+      Entries: options.entries?.map((e) => ({
+        Layer1: e.layer1,
+        Layer2: e.layer2,
+        Collide: e.collide,
+      })),
+      EnableAll: options.enableAll,
+      DisableAll: options.disableAll,
+    });
+  }
+
   // Prefab operations
   async createPrefab(options: {
     instanceId: number;

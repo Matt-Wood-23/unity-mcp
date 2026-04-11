@@ -112,6 +112,8 @@ namespace UnityMCPBridge
                         "/physics/collider" => PhysicsHandler.AddCollider(body),
                         "/physics/settings/set" => PhysicsHandler.SetPhysicsSettings(body),
                         "/physics/settings/get" => PhysicsHandler.GetPhysicsSettings(body),
+                        "/physics/collision/matrix/get" => PhysicsHandler.GetCollisionMatrix(body),
+                        "/physics/collision/matrix/set" => PhysicsHandler.SetCollisionMatrix(body),
                         // Audio
                         "/audio/source/add" => AudioHandler.AddAudioSource(body),
                         "/audio/source/modify" => AudioHandler.ModifyAudioSource(body),

@@ -1778,6 +1778,46 @@ const tools = [
       properties: {},
     },
   },
+  {
+    name: "unity_get_collision_matrix",
+    description:
+      "Get the layer collision matrix — shows which layer pairs collide with each other. Only returns pairs between named layers.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {},
+    },
+  },
+  {
+    name: "unity_set_collision_matrix",
+    description:
+      "Set which layers collide with each other. Can set specific layer pairs, or bulk enable/disable all collisions. Use layer indices (0-31). Specific entries are applied after bulk operations, so you can disable all then re-enable specific pairs.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        entries: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              layer1: { type: "number", description: "First layer index (0-31)" },
+              layer2: { type: "number", description: "Second layer index (0-31)" },
+              collide: { type: "boolean", description: "Whether these layers should collide" },
+            },
+            required: ["layer1", "layer2", "collide"],
+          },
+          description: "Specific layer pairs to set",
+        },
+        enableAll: {
+          type: "boolean",
+          description: "Set all layer pairs to collide (applied before entries)",
+        },
+        disableAll: {
+          type: "boolean",
+          description: "Set all layer pairs to not collide (applied before entries)",
+        },
+      },
+    },
+  },
 
   // Console
   {
@@ -2857,6 +2897,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "unity_get_physics_settings":
         result = await unityClient.getPhysicsSettings();
+        break;
+
+      case "unity_get_collision_matrix":
+        result = await unityClient.getCollisionMatrix();
+        break;
+
+      case "unity_set_collision_matrix":
+        result = await unityClient.setCollisionMatrix({
+          entries: args?.entries as { layer1: number; layer2: number; collide: boolean }[],
+          enableAll: args?.enableAll as boolean,
+          disableAll: args?.disableAll as boolean,
+        });
         break;
 
       // Console

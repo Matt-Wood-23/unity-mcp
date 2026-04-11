@@ -253,6 +253,122 @@ namespace UnityMCPBridge.Handlers
             }
         }
 
+        public static string GetCollisionMatrix(string body)
+        {
+            try
+            {
+                var pairs = new System.Collections.Generic.List<Models.CollisionMatrixLayerPair>();
+                var layers = new System.Collections.Generic.List<Models.LayerInfo>();
+
+                // Collect named layers
+                for (int i = 0; i < 32; i++)
+                {
+                    var name = LayerMask.LayerToName(i);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        layers.Add(new Models.LayerInfo { Index = i, Name = name });
+                    }
+                }
+
+                // Only report pairs between named layers (avoids 32x32 noise)
+                for (int i = 0; i < layers.Count; i++)
+                {
+                    for (int j = i; j < layers.Count; j++)
+                    {
+                        var l1 = layers[i].Index;
+                        var l2 = layers[j].Index;
+                        pairs.Add(new Models.CollisionMatrixLayerPair
+                        {
+                            Layer1 = l1,
+                            Layer1Name = layers[i].Name,
+                            Layer2 = l2,
+                            Layer2Name = layers[j].Name,
+                            Collide = !Physics.GetIgnoreLayerCollision(l1, l2)
+                        });
+                    }
+                }
+
+                return JsonConvert.SerializeObject(new Models.CollisionMatrixResult
+                {
+                    Success = true,
+                    Layers = layers,
+                    Pairs = pairs
+                }, Formatting.Indented);
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new Models.CollisionMatrixResult
+                {
+                    Success = false,
+                    Message = $"Error getting collision matrix: {e.Message}"
+                });
+            }
+        }
+
+        public static string SetCollisionMatrix(string body)
+        {
+            var request = JsonConvert.DeserializeObject<Models.SetCollisionMatrixRequest>(body);
+            if (request == null)
+            {
+                return JsonConvert.SerializeObject(new OperationResult
+                {
+                    Success = false,
+                    Message = "Invalid request body"
+                });
+            }
+
+            try
+            {
+                int changedCount = 0;
+
+                // Bulk enable/disable all
+                if (request.EnableAll == true || request.DisableAll == true)
+                {
+                    bool ignore = request.DisableAll == true;
+                    for (int i = 0; i < 32; i++)
+                    {
+                        for (int j = i; j < 32; j++)
+                        {
+                            Physics.IgnoreLayerCollision(i, j, ignore);
+                        }
+                    }
+                    changedCount = 528; // 32*33/2
+                }
+
+                // Set specific pairs (applied after bulk, so can be used as overrides)
+                if (request.Entries != null)
+                {
+                    foreach (var entry in request.Entries)
+                    {
+                        if (entry.Layer1 < 0 || entry.Layer1 > 31 || entry.Layer2 < 0 || entry.Layer2 > 31)
+                        {
+                            return JsonConvert.SerializeObject(new OperationResult
+                            {
+                                Success = false,
+                                Message = $"Layer index out of range (0-31): {entry.Layer1}, {entry.Layer2}"
+                            });
+                        }
+                        Physics.IgnoreLayerCollision(entry.Layer1, entry.Layer2, !entry.Collide);
+                        changedCount++;
+                    }
+                }
+
+                return JsonConvert.SerializeObject(new OperationResult
+                {
+                    Success = true,
+                    Message = $"Collision matrix updated ({changedCount} pairs modified)"
+                });
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new OperationResult
+                {
+                    Success = false,
+                    Message = $"Error setting collision matrix: {e.Message}"
+                });
+            }
+        }
+
         private static void ConfigureRigidbody(Rigidbody rb, AddRigidbodyRequest request)
         {
             rb.mass = request.Mass;

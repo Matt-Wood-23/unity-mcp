@@ -6,7 +6,7 @@ An MCP (Model Context Protocol) server that enables AI assistants like Claude to
 
 ## Features
 
-- **98 MCP Tools** for comprehensive Unity Editor control
+- **100 MCP Tools** for comprehensive Unity Editor control
 - **Real-time scene inspection** - View hierarchy, components, and properties
 - **Full CRUD operations** - Create, modify, delete GameObjects and components
 - **Material system** - Create, modify, and assign materials
@@ -219,6 +219,8 @@ Add `USING_URP` to **Project Settings → Player → Scripting Define Symbols** 
 | `unity_add_collider` | Add a Box, Sphere, Capsule, or Mesh collider |
 | `unity_set_physics_settings` | Modify global physics: gravity, solver iterations, thresholds |
 | `unity_get_physics_settings` | Read current global physics configuration |
+| `unity_get_collision_matrix` | Get layer collision matrix — which layer pairs collide |
+| `unity_set_collision_matrix` | Set layer collision pairs, bulk enable/disable all collisions |
 
 ### Physics (2D)
 
@@ -654,7 +656,7 @@ Contributions are welcome! Some ideas for future extensions:
 - [ ] Occlusion culling (bake/clear occlusion data)
 - [ ] Timeline (create tracks and clips)
 - [ ] XR/VR tools (XR Origin, XR Interactables, teleportation)
-- [ ] Layer collision matrix
+- [x] Layer collision matrix
 - [ ] Test runner integration
 
 ## License
