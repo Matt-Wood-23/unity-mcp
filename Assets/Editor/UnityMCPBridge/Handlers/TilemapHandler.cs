@@ -45,10 +45,11 @@ namespace UnityMCPBridge.Handlers
                                 grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
                                 break;
                             case "HEXFLAT":
-                                grid.cellLayout = GridLayout.CellLayout.HexagonalFlatTop;
+                                grid.cellLayout = GridLayout.CellLayout.Hexagon;
+                                grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
                                 break;
                             case "HEXPOINT":
-                                grid.cellLayout = GridLayout.CellLayout.Hexagonal;
+                                grid.cellLayout = GridLayout.CellLayout.Hexagon;
                                 break;
                             default:
                                 grid.cellLayout = GridLayout.CellLayout.Rectangle;

@@ -52,7 +52,7 @@ namespace UnityMCPBridge.Handlers
                     Speed = animator.speed,
                     Parameters = new List<AnimatorParameterInfo>(),
                     Layers = new List<AnimatorLayerInfo>(),
-                    Clips = new List<AnimatorClipInfo>()
+                    Clips = new List<Models.AnimatorClipInfo>()
                 };
 
                 // Get controller info
@@ -69,7 +69,7 @@ namespace UnityMCPBridge.Handlers
                         {
                             if (clip != null)
                             {
-                                result.Clips.Add(new AnimatorClipInfo
+                                result.Clips.Add(new Models.AnimatorClipInfo
                                 {
                                     Name = clip.name,
                                     Length = clip.length,
